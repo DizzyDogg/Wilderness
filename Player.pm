@@ -17,7 +17,7 @@ sub give {
     my ($self, $dungeon, $item, $to, $receiver) = @_;
     return warn "\tGive what to whom?\n" unless $item;
     return warn "\tYou have no $item to give\n" unless $self->has($item);
-    return warn "\tGive $item to whom?\n" unless defined $receiver;
+    return warn "\tGive $item to whom?\n" unless ref $receiver;
     # see if this warn spews on characters that do not exist anywhere
     return warn "\tSorry ... there is no $receiver here\n"
         unless $receiver->where() eq $self->where();
@@ -132,8 +132,8 @@ sub _kill {
     my $dungeon = shift;
     my ($baddie, $with, $item) = (@_, '', '');
     my $here = $self->where();
-    return warn "\t\u${word} who with what?\n" unless $baddie;
-    return warn "\t\uWhat will you kill the $baddie with?\n" unless $item;
+    return warn "\t\u${word} who with what?\n" unless ref $baddie;
+    return warn "\t\uWhat will you kill the $baddie with?\n" unless ref $item;
     return warn "\tYou don't have a $item\n" unless $self->has($item);
     return warn "\tThere is no $baddie here\n" unless $baddie->where() eq $here;
 
@@ -142,10 +142,11 @@ sub _kill {
     foreach my $item ( keys %$loot ) {
         $here->item_add($item);
         $baddie->inventory_remove($item);
-        print "\u\tYou ${word}ed the $baddie\n";
     }
     # and eliminate it
     $here->occupant_remove($baddie);
+    $dungeon->delete($baddie);
+    print "\u\tYou ${word}ed the $baddie\n";
 }
 
 1;

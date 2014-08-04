@@ -14,7 +14,7 @@ sub item_add {
 sub item_remove {
     my $self = shift;
     my $item = shift;
-    return $self->{'contents'}{$item}--;
+    $self->{'contents'}{$item}--;
     delete $self->{'contents'}{$item} unless $self->{'contents'}{$item};
     return $self;
 }
