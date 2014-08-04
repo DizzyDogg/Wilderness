@@ -13,9 +13,11 @@ $dungeon->initialize();
 my $player = $dungeon->{'things'}{'me'};
 
 my %alternates = (
-    have => 'inventory',
-    grab => 'take',
-    get  => 'take',
+    have    => 'inventory',
+    grab    => 'take',
+    get     => 'take',
+    pickup  => 'take',
+    retrieve => 'take',
 );
 
 print "\n\nWelcome to the Dungeon of Awesome.\n";
