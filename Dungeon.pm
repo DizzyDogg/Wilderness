@@ -63,4 +63,10 @@ sub initialize {
     }
 }
 
+sub delete {
+    my $self = shift;
+    my $thing = shift;
+    delete $self->{'things'}{$thing};
+}
+
 1;
