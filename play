@@ -1,0 +1,56 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use World;
+use Data::Dumper;
+use Player;
+
+my $world= World->new(name => 'Awesome');
+$world->initialize();
+
+my $player = $world->{'things'}{'me'};
+
+my %alternates = (
+    have    => 'inventory',
+    grab    => 'take',
+    get     => 'take',
+    pickup  => 'take',
+    retrieve => 'take',
+);
+
+print "\n\nWelcome to the World of Awesome.\n";
+print "Do you have what it takes to survive?\n\n";
+
+$player->look($world);
+
+while ( my ($verb, @arguments) = prompt() ) {
+    if ( my $m = $player->can($alternates{$verb} || $verb) ) {
+        my @args = string2obj(@arguments);
+        $player->$m($world, @args);
+    }
+    else {
+        warn "\tYou do not know how to $verb\n";
+    }
+}
+
+# Modify prompt to not return until it gets an input
+sub prompt {
+    print "\nWhat would you like to do? ";
+    my $command = <STDIN>;
+    chomp $command;
+    $command =~ s/\bthe\b//;
+    $command =~ s/\ba\b//;
+    $command =~ s/\bat\b//;
+    return split /\s+/, $command;
+}
+
+sub string2obj {
+    my @strings = @_;
+    my @objects;
+    foreach my $string ( @strings ) {
+        push @objects, $world->{'things'}{$string} || $string;
+    }
+    return @objects;
+}

@@ -1,0 +1,60 @@
+me is Player
+deer is Mob::Deer
+bird is Mob::Bird
+tree is Mob::Tree
+mountain is Mob::Mountain
+forest is Place
+field is Place
+river is Place
+lake is Place
+waterfall is Place
+plains is Place
+swamp is Place
+mountain is Place
+hill is Place
+fist is Item::Fish
+rock is Item::Rock
+string is Item::String
+rope is Item::Rope
+bread is Item::Bread
+knife is Item::Knife
+shovel is Item::Shovel
+log is Item::Log
+stick is Item::Stick
+twig is Item::Twig
+fishingpole is Item::FishingPole
+me is in plains
+bird is in field
+bird has feather
+deer is in forest
+deer has raw venison
+forest contains tree
+tree has log
+tree has stick
+tree has twig
+rock is in mountain
+plains contains wheat
+waterfall goes south to river
+waterfall goes west to mountain
+river goes north to waterfall
+river goes west to hill
+river goes south to lake
+lake goes north to river
+lake goes west to field
+mountain goes west to swamp
+mountain goes south to hill
+mountain goes east to waterfall
+hill goes north to mountain
+hill goes west to forest
+hill goes south to field
+hill goes east to river
+field goes west to plains
+field goes north to hill
+field goes east to lake
+swamp goes south to forest
+swamp goes east to mountain
+forest goes north to swamp
+forest goes east to hill
+forest goes south to plains
+plains goes north to forest
+plains goes east to field
