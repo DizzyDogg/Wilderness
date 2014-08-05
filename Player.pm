@@ -14,7 +14,7 @@ sub name {
 sub quit { exit }
 
 sub give {
-    my ($self, $dungeon, $item, $to, $receiver) = @_;
+    my ($self, $world, $item, $to, $receiver) = @_;
     return warn "\tGive what to whom?\n" unless $item;
     return warn "\tYou have no $item to give\n" unless $self->has($item);
     return warn "\tGive $item to whom?\n" unless ref $receiver;
@@ -29,7 +29,7 @@ sub give {
 
 sub go {
     my $self = shift;
-    my $dungeon = shift;
+    my $world = shift;
     my $direction = shift;
     my $here = $self->where();
     return warn "\tGo where?\n"
@@ -37,13 +37,13 @@ sub go {
     return warn "\tCan't go $direction from here\n"
         unless my $new_room = $self->can_go($direction);
     $self->move_to($new_room);
-    $self->look($dungeon);
+    $self->look($world);
     return $self;
 }
 
 sub inventory {
     my $self = shift;
-    my $dungeon = shift;
+    my $world = shift;
     my @args = @_;
     my $possessions = $self->get_possessions();
     print "\tYou have ... nothing\n" unless keys %$possessions;
@@ -56,7 +56,7 @@ sub inventory {
 
 sub drop {
     my $self = shift;
-    my $dungeon = shift;
+    my $world = shift;
     my $what = shift;
     my $here = $self->where();
     return warn "\tYou don't have a $what\n" unless $self->has($what);
@@ -67,7 +67,7 @@ sub drop {
 
 sub take {
     my $self = shift;
-    my $dungeon = shift;
+    my $world = shift;
     my $what = shift;
     my $here = $self->where();
     if ( $here->is_occupied_by($what) ) {
@@ -84,12 +84,12 @@ sub take {
 
 sub look {
     my $self = shift;
-    my $dungeon = shift;
+    my $world = shift;
     my @args = @_;
     my $here = $self->where();
 
     if (@args) {
-        $self->examine($dungeon, @args);
+        $self->examine($world, @args);
     }
     else {
         print "\tYou are in the $here\n";
@@ -112,7 +112,7 @@ sub look {
 
 sub examine {
     my $self = shift;
-    my $dungeon = shift;
+    my $world = shift;
     my $thing = shift;
     my $here = $self->where();
     my $room = $self->can_go($thing);
@@ -129,7 +129,7 @@ sub slay { shift->_kill(slay => @_) }
 sub _kill {
     my $self = shift;
     my $word = shift;
-    my $dungeon = shift;
+    my $world = shift;
     my ($baddie, $with, $item) = (@_, '', '');
     my $here = $self->where();
     return warn "\t\u${word} who with what?\n" unless ref $baddie;
@@ -145,7 +145,7 @@ sub _kill {
     }
     # and eliminate it
     $here->occupant_remove($baddie);
-    $dungeon->delete($baddie);
+    $world->delete($baddie);
     print "\u\tYou ${word}ed the $baddie\n";
 }
 
