@@ -9,11 +9,11 @@ sub is_hostile { 1 }
 
 sub hit_points { 10 }
 
-my $description = 'It is huge and intimidating';
+my $desc = 'It is huge and intimidating';
 
 sub describe {
     my $self = shift;
-    return $description;
+    return $desc;
 }
 
 1;

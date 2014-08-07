@@ -37,9 +37,11 @@ sub name {
     return $self->{'name'};
 }
 
+my $default_description = 'There does not appear to be anything special about it';
+
 sub describe {
     my $self = shift;
-    return "There does not appear to be anything special about it";
+    return $default_description;
 }
 
 1;
