@@ -6,11 +6,12 @@ use warnings;
 use base qw(Object);
 use Mob::Deer;
 use Mob::Bird;
-use Mob::Tree;
-use Mob::Mountain;
+use Spawner::Tree;
+use Spawner::Mountain;
 use Place;
 use Player;
 use Item::Fish;
+use Item::Feather;
 use Item::Rock;
 use Item::String;
 use Item::Knife;
@@ -22,6 +23,7 @@ use Item::Stick;
 use Item::Twig;
 use Item::Log;
 use Item::Wheat;
+use Item::Venison;
 
 use Data::Dumper;
 
@@ -54,10 +56,14 @@ sub initialize {
             elsif ( $verb eq 'contains' ) {
                 # my $item = $self->{'things'}{$object[0]};
                 # die Dumper $self;
-                $it->item_add($object[0]) || die "Cannot populate room contents: $line\n";
+                $it->item_add($self->{'things'}{$object[0]}) || die "Cannot populate room items: $line\n";
+            }
+            elsif ( $verb eq 'inhabits' ) {
+                my $place = $self->{'things'}{$object[0]};
+                $place->object_add($it) || die "Cannot populate room objects: $line\n";
             }
             elsif ( $verb eq 'has' ) {
-                $it->inventory_add($object[0]) || die "Cannot populate inventory: $line\n";
+                $it->inventory_add($self->{'things'}{$object[0]}) || die "Cannot populate inventory: $line\n";
             }
             elsif ( $verb eq 'goes' ) {
                 $it->exit_add($object[0], $self->{'things'}{$object[2]}) || die "Cannot populate exits: $line\n";

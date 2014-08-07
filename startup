@@ -1,8 +1,10 @@
 me is Player
 deer is Mob::Deer
 bird is Mob::Bird
-tree is Mob::Tree
-mountain is Mob::Mountain
+feather is Item::Feather
+venison is Item::Venison
+tree is Spawner::Tree
+mountain is Spawner::Mountain
 forest is Place
 field is Place
 river is Place
@@ -14,6 +16,7 @@ mountain is Place
 hill is Place
 fist is Item::Fish
 rock is Item::Rock
+wheat is Item::Wheat
 string is Item::String
 rope is Item::Rope
 bread is Item::Bread
@@ -27,8 +30,8 @@ me is in plains
 bird is in field
 bird has feather
 deer is in forest
-deer has raw venison
-forest contains tree
+deer has venison
+tree inhabits forest
 tree has log
 tree has stick
 tree has twig

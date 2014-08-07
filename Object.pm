@@ -4,6 +4,10 @@ use strict;
 use warnings;
 
 use overload
+    'bool' => sub {
+        my $self = shift;
+        return $self;
+    },
     '""' => sub {
         my $self = shift;
         return $self->name();
@@ -22,6 +26,8 @@ use overload
 sub new {
     my $package = shift;
     my $self = {@_};
+    $self->{'hidden'} = Container->new();
+    $self->{'visible'} = Container->new();
     bless $self, $package;
     return $self;
 }

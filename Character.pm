@@ -10,34 +10,9 @@ use Data::Dumper;
 sub can_go {
     my $self = shift;
     my $direction = shift;
-    my $exits = $self->where()->available_exits();
-    return $exits->{$direction};
-}
-
-sub inventory_add {
-    my $self = shift;
-    my $item = shift;
-    $self->{'inventory'}{$item}++;
-    return $self;
-}
-
-sub inventory_remove {
-    my $self = shift;
-    my $item = shift;
-    $self->{'inventory'}{$item}--;
-    delete $self->{'inventory'}{$item} unless $self->{'inventory'}{$item};
-    return $self;
-}
-
-sub get_possessions {
-    my $self = shift;
-    return $self->{'inventory'};
-}
-
-sub has {
-    my $self = shift;
-    my $item = shift || '';
-    return $self->{'inventory'}{$item};
+    my $here = $self->where();
+    my $exits = $here->get_exits();
+    return $exits->{$direction} ? 1: 0;
 }
 
 sub move_to {
@@ -57,7 +32,80 @@ sub where {
 sub is_in {
     my $self = shift;
     my $place = shift;
-    return $place->{'contents'}{$self};
+    return $self->{'location'} eq $place;
 }
 
+sub equip {
+    my $self = shift;
+    my $item = shift;
+    $self->inventory_remove($item);
+    $self->equipment_add($item);
+}
+
+sub unequip {
+    my $self = shift;
+    my $item = shift;
+    $self->equipment_remove($item);
+    $self->inventory_add($item);
+}
+
+sub inventory_add {
+    my $self = shift;
+    my $item = shift;
+    $self->{'hidden'}->add($item);
+}
+
+sub inventory_remove {
+    my $self = shift;
+    my $item = shift;
+    $self->{'hidden'}->remove($item);
+}
+
+sub equipment_add {
+    my $self = shift;
+    my $item = shift;
+    $self->{'visible'}->add($item);
+}
+
+sub equipment_remove {
+    my $self = shift;
+    my $item = shift;
+    $self->{'visible'}->remove($item);
+}
+
+sub get_equipment{
+    my $self = shift;
+    my @items = $self->{'visible'}->get_all();
+    return @items;
+}
+
+sub get_inventory{
+    my $self = shift;
+    my @items = $self->{'hidden'}->get_all();
+    return @items;
+}
+
+sub get_all {
+    my $self = shift;
+    my @possessions = ( $self->get_equipment(), $self->get_inventory() );
+    return @possessions;
+}
+
+sub has {
+    my $self = shift;
+    my $item = shift;
+    return ( $self->has_on($item) || $self->has_in($item) ) ? 1 : 0;
+}
+
+sub has_on {
+    my $self = shift;
+    my $item = shift;
+    return $self->{'visible'}->contains($item);
+}
+
+sub has_in {
+    my $self = shift;
+    my $item = shift;
+    return $self->{'hidden'}->contains($item);
+}
 1;

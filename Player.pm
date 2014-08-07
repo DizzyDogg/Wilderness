@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use base qw(Character);
+use Data::Dumper;
 
 sub name {
     my $self = shift;
@@ -11,19 +12,22 @@ sub name {
     return lc $name;
 }
 
-sub quit { exit }
+sub quit {
+    warn "\tI hope you enjoyed your stay in the Wilderness of Awesome !!!\n";
+    exit }
 
 sub give {
     my ($self, $world, $item, $to, $receiver) = @_;
     return warn "\tGive what to whom?\n" unless $item;
     return warn "\tYou have no $item to give\n" unless $self->has($item);
+    return warn "\tYou must unequip the $item before you can give it away\n" unless $self->has_in($item);
     return warn "\tGive $item to whom?\n" unless ref $receiver;
     # see if this warn spews on characters that do not exist anywhere
     return warn "\tSorry ... there is no $receiver here\n"
         unless $receiver->where() eq $self->where();
 
-    $self->inventory_remove($item);
-    $receiver->inventory_add($item);
+    $self->{'hidden'}->remove($item);
+    $receiver->{'hidden'}->add($item);
     print "\t$self gave the $item to the $receiver\n";
 }
 
@@ -35,7 +39,7 @@ sub go {
     return warn "\tGo where?\n"
         unless defined $direction;
     return warn "\tCan't go $direction from here\n"
-        unless my $new_room = $self->can_go($direction);
+        unless my $new_room = $here->leads_to($direction);
     $self->move_to($new_room);
     $self->look($world);
     return $self;
@@ -45,12 +49,19 @@ sub inventory {
     my $self = shift;
     my $world = shift;
     my @args = @_;
-    my $possessions = $self->get_possessions();
-    print "\tYou have ... nothing\n" unless keys %$possessions;
-    for my $item ( keys %$possessions ) {
-        my $how_many = $possessions->{$item} == 1 ? 'a' : $possessions->{$item};
-        $item .= 's' if $how_many ne 'a';
-        print "\tYou have $how_many $item\n";
+    my @equipment = $self->get_equipment();
+    my @inventory = $self->get_inventory();
+    my @possessions = ( @equipment, @inventory );
+    print "\tYou have ... nothing\n" unless @possessions;
+    foreach my $item ( @inventory ) {
+        # my $how_many = $possessions->{$item} == 1 ? 'a' : $possessions->{$item};
+        # $item .= 's' if $how_many ne 'a';
+        print "\tYou have a $item\n";
+    }
+    foreach my $item ( @equipment ) {
+        # my $how_many = $possessions->{$item} == 1 ? 'a' : $possessions->{$item};
+        # $item .= 's' if $how_many ne 'a';
+        print "\tYou have a $item equipped\n";
     }
 }
 
@@ -60,7 +71,7 @@ sub drop {
     my $what = shift;
     my $here = $self->where();
     return warn "\tYou don't have a $what\n" unless $self->has($what);
-    $self->inventory_remove($what);
+    $self->{'hidden'}->remove($what);
     $here->item_add($what);
     print "\tYou place the $what gently on the ground\n";
 }
@@ -70,13 +81,16 @@ sub take {
     my $world = shift;
     my $what = shift;
     my $here = $self->where();
-    if ( $here->is_occupied_by($what) ) {
+    if ( $here->has_occupant($what) ) {
         print "\tSeriously? ... you really want that $what?\n";
         print "\tYou lonely? You want it as a pet or something?\n";
         print "\tProbably not the best idea\n";
         return;
     }
-    return warn "\tThere's no $what here\n" unless $here->contains($what);
+    if ( $here->has_object($what) ) {
+        return warn "\tThe $what is relatively permanent ... sorry\n";
+    }
+    return warn "\tThere's no $what here\n" unless $here->has_item($what);
     $here->item_remove($what);
     $self->inventory_add($what);
     print "\tYou now have the $what\n";
@@ -94,18 +108,22 @@ sub look {
     else {
         print "\tYou are in the $here\n";
 
-        my $items = $here->get_contents();
-        foreach my $item ( keys %$items ) {
-            my $how_many = $items->{$item} == 1 ? 'a' : $items->{$item};
-            $item .= 's' if $how_many ne 'a';
-            print "\tYou see $how_many $item on the ground\n";
+        my @items = $here->get_items();
+        foreach my $item ( @items ) {
+            # my $how_many = $items->{$item} == 1 ? 'a' : $items->{$item};
+            # $item .= 's' if $how_many ne 'a';
+            print "\tYou see a $item lying on the ground\n";
+        }
+        my @objects = $here->get_objects();
+        foreach my $object ( @objects) {
+            print "\tThere is a $object here\n";
         }
 
-        my $chars = $here->get_occupants();
-        my @not_me = grep { "$_" ne "$self" } keys %$chars;
-        print "\tThere is a $_ here\n" foreach @not_me;
+        my @chars = $here->get_occupants();
+        my @not_me = grep { "$_" ne "$self" } @chars;
+        print "\tA $_ notices your presence\n" foreach @not_me;
 
-        my $exits = $here->available_exits();
+        my $exits = $here->get_exits();
         print ("\tThere are exits leading " . join(', ', keys %$exits) . "\n") if $exits;
     }
 }
@@ -115,9 +133,14 @@ sub examine {
     my $world = shift;
     my $thing = shift;
     my $here = $self->where();
-    my $room = $self->can_go($thing);
-    return warn "\t$thing leads to the $room\n" if $room;
-    return warn "\tYou cannot see a $thing\n" unless ( $self->has($thing) || $here->contains($thing) || $here->is_occupied_by($thing) );
+    if ( $thing =~ /up|down|north|south|east|west/ ) {
+        my $room = $here->leads_to($thing);
+        return warn "\tYou see nothing of interest $thing\n" unless $room;
+        print "\tWhen you look $thing, you see the $room\n" if $room;
+        return;
+    }
+    return warn "\tI have no idea what a $thing is\n" unless ref $thing;
+    return warn "\tYou cannot see a $thing\n" unless ( $self->has($thing) || $here->has($thing) );
     my $description = $thing->describe();
     return warn "\t$description\n";
 }
@@ -136,12 +159,13 @@ sub _kill {
     return warn "\t\uWhat will you kill the $baddie with?\n" unless ref $item;
     return warn "\tYou don't have a $item\n" unless $self->has($item);
     return warn "\tThere is no $baddie here\n" unless $baddie->where() eq $here;
+    return warn "\tWhy would you kill the poor innocent $baddie?\n"
+                . "\tIt hasn't done anything to anyone\n" unless $here->has_occupant($baddie);
 
     # now we add its inventory to the room's inventory
-    my $loot = $baddie->get_possessions();
-    foreach my $item ( keys %$loot ) {
+    my @loot = $baddie->get_all();
+    foreach my $item ( @loot ) {
         $here->item_add($item);
-        $baddie->inventory_remove($item);
     }
     # and eliminate it
     $here->occupant_remove($baddie);

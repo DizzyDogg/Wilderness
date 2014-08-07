@@ -5,6 +5,7 @@ use warnings;
 
 use base qw(Character);
 use Module::Pluggable;
+use Container;
 
 sub hit_points { 1 }
 
