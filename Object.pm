@@ -37,6 +37,11 @@ sub name {
     return $self->{'name'};
 }
 
+sub where {
+    my $self = shift;
+    return $self->{'location'};
+}
+
 my $default_description = 'There does not appear to be anything special about it';
 
 sub describe {

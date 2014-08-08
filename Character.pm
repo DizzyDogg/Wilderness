@@ -24,11 +24,6 @@ sub move_to {
     return $self->{'location'} = $where;
 }
 
-sub where {
-    my $self = shift;
-    return $self->{'location'};
-}
-
 sub is_in {
     my $self = shift;
     my $place = shift;
