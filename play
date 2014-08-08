@@ -18,6 +18,10 @@ my %alternates = (
     get     => 'take',
     pickup  => 'take',
     retrieve => 'take',
+    walk    => 'go',
+    attack  => 'kill',
+    speak   => 'say',
+    talk    => 'say',
 );
 
 print "\n\nWelcome to the World of Awesome.\n";

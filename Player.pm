@@ -145,6 +145,13 @@ sub examine {
     return warn "\t$description\n";
 }
 
+sub say {
+    my $self = shift;
+    print "\tYou mutter for a bit ... and realize you are talking to youself\n"
+          ."\tYou decide that you can indeed still talk\n"
+          ."\tBut, you shake your head and refocus your efforts on surviving\n";
+}
+
 sub kill { shift->_kill(kill => @_) }
 
 sub slay { shift->_kill(slay => @_) }
