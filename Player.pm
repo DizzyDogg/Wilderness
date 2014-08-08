@@ -160,7 +160,7 @@ sub _kill {
     my $self = shift;
     my $word = shift;
     my $world = shift;
-    my ($baddie, $with, $item) = (@_, '', '');
+    my ($baddie, $with, $item) = (@_);
     my $here = $self->where();
     return warn "\t\u${word} who with what?\n" unless ref $baddie;
     return warn "\t\uWhat will you kill the $baddie with?\n" unless ref $item;
@@ -168,6 +168,8 @@ sub _kill {
     return warn "\tThere is no $baddie here\n" unless $baddie->where() eq $here;
     return warn "\tWhy would you kill the poor innocent $baddie?\n"
                 . "\tIt hasn't done anything to anyone\n" unless $here->has_occupant($baddie);
+    return warn "\tUh ... I am pretty sure suicide is illegal\n"
+                . "\tand generally considered bad for your health\n" if $baddie == $self;
 
     # now we add its inventory to the room's inventory
     my @loot = $baddie->get_all();
