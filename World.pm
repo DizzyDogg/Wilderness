@@ -60,7 +60,7 @@ sub initialize {
             }
             elsif ( $verb eq 'inhabits' ) {
                 my $place = $self->{'things'}{$object[0]};
-                $place->object_add($it) || die "Cannot populate room objects: $line\n";
+                $place->fixture_add($it) || die "Cannot populate room fixtures: $line\n";
             }
             elsif ( $verb eq 'has' ) {
                 $it->inventory_add($self->{'things'}{$object[0]}) || die "Cannot populate inventory: $line\n";

@@ -87,7 +87,7 @@ sub take {
         print "\tProbably not the best idea\n";
         return;
     }
-    if ( $here->has_object($what) ) {
+    if ( $here->has_fixture($what) ) {
         return warn "\tThe $what is relatively permanent ... sorry\n";
     }
     return warn "\tThere's no $what here\n" unless $here->has_item($what);
@@ -114,9 +114,9 @@ sub look {
             # $item .= 's' if $how_many ne 'a';
             print "\tYou see a $item lying on the ground\n";
         }
-        my @objects = $here->get_objects();
-        foreach my $object ( @objects) {
-            print "\tThere is a $object here\n";
+        my @fixtures = $here->get_fixtures();
+        foreach my $fixture ( @fixtures) {
+            print "\tThere is a $fixture here\n";
         }
 
         my @chars = $here->get_occupants();

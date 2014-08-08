@@ -10,24 +10,24 @@ sub new {
     my $self = {@_};
     $self->{'items'} = Container->new();
     $self->{'occupants'} = Container->new();
-    $self->{'objects'} = Container->new();
+    $self->{'fixtures'} = Container->new();
     bless $self, $package;
     return $self;
 }
 
-sub object_add {
+sub fixture_add {
     my $self = shift;
-    my $object = shift;
-    my $added = $self->{'objects'}->add($object);
-    $object->{'location'} = $self if $added;
+    my $fixture = shift;
+    my $added = $self->{'fixtures'}->add($fixture);
+    $fixture->{'location'} = $self if $added;
     return $added;
 }
 
-sub object_remove {
+sub fixture_remove {
     my $self = shift;
-    my $object = shift;
-    my $removed = $self->{'objects'}->remove($object);
-    delete $object->{'location'} if $removed;
+    my $fixture = shift;
+    my $removed = $self->{'fixtures'}->remove($fixture);
+    delete $fixture->{'location'} if $removed;
     return $removed;
 }
 
@@ -67,7 +67,7 @@ sub has {
     my $self = shift;
     my $item = shift;
     return $self->has_item($item)
-        || $self->has_object($item)
+        || $self->has_fixture($item)
         || $self->has_occupant($item);
 }
 
@@ -77,10 +77,10 @@ sub has_item {
     return $self->{'items'}->contains($item);
 }
 
-sub has_object {
+sub has_fixture {
     my $self = shift;
-    my $object = shift;
-    return $self->{'objects'}->contains($object);
+    my $fixture = shift;
+    return $self->{'fixtures'}->contains($fixture);
 }
 
 sub has_occupant {
@@ -94,9 +94,9 @@ sub get_items {
     return $self->{'items'}->get_all();
 }
 
-sub get_objects {
+sub get_fixtures {
     my $self = shift;
-    return $self->{'objects'}->get_all();
+    return $self->{'fixtures'}->get_all();
 }
 
 sub get_occupants {
