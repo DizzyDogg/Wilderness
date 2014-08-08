@@ -35,7 +35,7 @@ tree inhabits forest
 tree has log
 tree has stick
 tree has twig
-rock is in mountain
+mountain contains rock
 plains contains wheat
 waterfall goes south to river
 waterfall goes west to mountain
