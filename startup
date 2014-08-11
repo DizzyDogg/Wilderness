@@ -4,6 +4,7 @@ bird is Mob::Bird
 feather is Item::Feather
 venison is Item::Venison
 tree is Spawner::Tree
+fillet is Item::Fillet
 mountain is Spawner::Mountain
 forest is Place
 field is Place
@@ -14,7 +15,7 @@ plains is Place
 swamp is Place
 mountain is Place
 hill is Place
-fist is Item::Fish
+fish is Item::Fish
 rock is Item::Rock
 wheat is Item::Wheat
 string is Item::String
@@ -29,6 +30,8 @@ fishingpole is Item::FishingPole
 me is in plains
 bird is in field
 bird has feather
+river contains fish
+fish has fillet
 deer is in forest
 deer has venison
 tree inhabits forest

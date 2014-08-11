@@ -49,4 +49,10 @@ sub describe {
     return $default_description;
 }
 
+sub inventory_add {
+    my $self = shift;
+    my $item = shift;
+    $self->{'hidden'}->add($item);
+}
+
 1;

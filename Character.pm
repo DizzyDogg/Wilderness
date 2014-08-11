@@ -44,12 +44,6 @@ sub unequip {
     $self->inventory_add($item);
 }
 
-sub inventory_add {
-    my $self = shift;
-    my $item = shift;
-    $self->{'hidden'}->add($item);
-}
-
 sub inventory_remove {
     my $self = shift;
     my $item = shift;

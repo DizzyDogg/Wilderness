@@ -10,6 +10,7 @@ use Spawner::Tree;
 use Spawner::Mountain;
 use Place;
 use Player;
+use Item::Fillet;
 use Item::Fish;
 use Item::Feather;
 use Item::Rock;
