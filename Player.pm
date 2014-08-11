@@ -81,6 +81,7 @@ sub take {
     my $world = shift;
     my $what = shift;
     my $here = $self->where();
+    return warn "\tI don't know what a $what is\n" unless ref $what;
     if ( $here->has_occupant($what) ) {
         print "\tSeriously? ... you really want that $what?\n";
         print "\tYou lonely? You want it as a pet or something?\n";
