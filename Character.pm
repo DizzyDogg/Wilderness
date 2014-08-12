@@ -30,56 +30,6 @@ sub is_in {
     return $self->{'location'} eq $place;
 }
 
-sub equip {
-    my $self = shift;
-    my $item = shift;
-    $self->inventory_remove($item);
-    $self->equipment_add($item);
-}
-
-sub unequip {
-    my $self = shift;
-    my $item = shift;
-    $self->equipment_remove($item);
-    $self->inventory_add($item);
-}
-
-sub inventory_remove {
-    my $self = shift;
-    my $item = shift;
-    $self->{'hidden'}->remove($item);
-}
-
-sub equipment_add {
-    my $self = shift;
-    my $item = shift;
-    $self->{'visible'}->add($item);
-}
-
-sub equipment_remove {
-    my $self = shift;
-    my $item = shift;
-    $self->{'visible'}->remove($item);
-}
-
-sub get_equipment{
-    my $self = shift;
-    my @items = $self->{'visible'}->get_all();
-    return @items;
-}
-
-sub get_inventory{
-    my $self = shift;
-    my @items = $self->{'hidden'}->get_all();
-    return @items;
-}
-
-sub get_all {
-    my $self = shift;
-    my @possessions = ( $self->get_equipment(), $self->get_inventory() );
-    return @possessions;
-}
-
 sub get_health { 1 }
 
 sub has {

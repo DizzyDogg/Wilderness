@@ -25,6 +25,7 @@ use Item::Twig;
 use Item::Log;
 use Item::Wheat;
 use Item::Venison;
+use Item::Branch;
 
 use Data::Dumper;
 
@@ -65,6 +66,9 @@ sub initialize {
             }
             elsif ( $verb eq 'has' ) {
                 $it->inventory_add($self->{'things'}{$object[0]}) || die "Cannot populate inventory: $line\n";
+            }
+            elsif ( $verb eq 'equips' ) {
+                $it->equipment_add($self->{'things'}{$object[0]}) || die "Cannot populate inventory: $line\n";
             }
             elsif ( $verb eq 'goes' ) {
                 $it->exit_add($object[0], $self->{'things'}{$object[2]}) || die "Cannot populate exits: $line\n";

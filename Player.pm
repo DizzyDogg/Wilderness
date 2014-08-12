@@ -185,6 +185,6 @@ sub _kill {
     $world->delete($baddie);
 }
 
-sub die { warn "\tUmmm ... No! That is the OPPOSITE if the point of this game\n" }
+sub die { warn "\tUmmm ... No! That is the OPPOSITE of the point of this game\n" }
 
 1;
