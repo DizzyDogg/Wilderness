@@ -174,14 +174,15 @@ sub _kill {
                 . "\tand generally considered bad for your health\n" if $baddie == $self;
 
     # now we add its inventory to the room's inventory
+    print "\u\tYou ${word}ed the $baddie\n";
     my @loot = $baddie->get_all();
     foreach my $item ( @loot ) {
         $here->item_add($item);
+        warn "\tThe $baddie dropped $item on the ground\n";
     }
     # and eliminate it
     $here->occupant_remove($baddie);
     $world->delete($baddie);
-    print "\u\tYou ${word}ed the $baddie\n";
 }
 
 1;
