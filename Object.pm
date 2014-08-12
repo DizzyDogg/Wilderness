@@ -3,6 +3,8 @@ package Object;
 use strict;
 use warnings;
 
+use Data::Dumper;
+
 use overload
     'bool' => sub {
         my $self = shift;
@@ -13,14 +15,16 @@ use overload
         return $self->name();
     },
     '==' => sub {
-        my $self = shift;
-        my $self2 = shift;
-        return $self->name() eq $self2->name();
+        my $a = shift;
+        my $b = shift;
+        return 0 unless ( ref $a && ref $b && $a->can('name') && $b->can('name') );
+        return $a->name() eq $b->name();
     },
     'eq' => sub {
-        my $self = shift;
-        my $self2 = shift;
-        return $self->name() eq $self2->name();
+        my $a = shift;
+        my $b = shift;
+        return 0 unless ( ref $a && ref $b && $a->can('name') && $b->can('name') );
+        return $a->name() eq $b->name();
     };
 
 sub new {
@@ -31,6 +35,8 @@ sub new {
     bless $self, $package;
     return $self;
 }
+
+sub get_health { undef }
 
 sub name {
     my $self = shift;

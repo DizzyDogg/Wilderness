@@ -80,6 +80,8 @@ sub get_all {
     return @possessions;
 }
 
+sub get_health { 1 }
+
 sub has {
     my $self = shift;
     my $item = shift;

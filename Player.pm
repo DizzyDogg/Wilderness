@@ -166,6 +166,7 @@ sub _kill {
     return warn "\t\u${word} who with what?\n" unless ref $baddie;
     return warn "\t\uWhat will you kill the $baddie with?\n" unless ref $item;
     return warn "\tYou don't have a $item\n" unless $self->has($item);
+    return warn "\t$baddie is not something that can be killed\n" unless $baddie->get_health();
     return warn "\tThere is no $baddie here\n" unless $baddie->where() eq $here;
     return warn "\tWhy would you kill the poor innocent $baddie?\n"
                 . "\tIt hasn't done anything to anyone\n" unless $here->has_occupant($baddie);
