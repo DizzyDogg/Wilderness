@@ -52,19 +52,23 @@ my $default_description = 'There does not appear to be anything special about it
 
 sub describe {
     my $self = shift;
+    return join ("\n\t", $default_description, $self->get_sub_description());
+}
+
+sub get_sub_description {
+    my $self = shift;
     my @items = $self->get_equipment();
     my @lines;
     if ( @items ) {
         foreach my $item (@items) {
-            push @lines, 'The $self has a $item';
+            push @lines, "\tThe $self has a $item";
             my @items_items = $item->get_equipment();
             foreach my $items_item (@items_items) {
-                push @lines, 'The $item has a $items_item';
+                push @lines, "\tThe $item has a $items_item";
             }
         }
     }
-    my $description = join '\n\t', @lines;
-    return $description || $default_description;
+    return @lines;
 }
 
 sub equip {
