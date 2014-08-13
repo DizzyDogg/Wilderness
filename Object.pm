@@ -38,6 +38,10 @@ sub new {
     return $self;
 }
 
+sub is_item { return }
+sub is_character { return }
+sub is_fixture { return }
+
 sub get_health { undef }
 
 sub name {
@@ -57,7 +61,7 @@ sub describe {
     return join ("\n\t", $default_description, $self->get_sub_description());
 }
 
-sub get_ingredient { return undef }
+sub get_ingredients { return }
 
 sub get_sub_description {
     my $self = shift;

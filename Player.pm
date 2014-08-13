@@ -157,21 +157,24 @@ sub recipe {
     my $self = shift;
     my $world = shift;
     my $product = shift;
+    return warn "\tI don't know what a $product is\n" unless ref $product;
     my @ingredients = $product->get_ingredients();
-    return warn "\tA $product is not something you know how to make\n" unless @ingredients;
+    return warn "\tA $product is not something you know how to make\n" unless defined @ingredients;
     my $recipe = "\tTo make a $product, you need\n";
     foreach my $ingredient (@ingredients) {
         $recipe .= "\t\tA $ingredient\n";
     }
-    return warn "$recipe\n";
+    return warn "$recipe";
 }
 
 sub make {
     my $self = shift;
     my $world = shift;
     my $product = shift;
+    return warn "\tI don't know what a $product is\n" unless ref $product;
     my $here = $self->where();
     my @ingredients = $product->get_ingredients();
+    return warn "\tA $product is not something you know how to make\n" unless defined @ingredients;
     my @lack;
     foreach my $ingredient (@ingredients) {
         push @lack, $ingredient unless $self->has($ingredient);

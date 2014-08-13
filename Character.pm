@@ -7,6 +7,8 @@ use base qw(Object);
 
 use Data::Dumper;
 
+sub is_character { return 1 }
+
 sub can_go {
     my $self = shift;
     my $direction = shift;

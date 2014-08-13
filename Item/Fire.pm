@@ -5,9 +5,6 @@ use warnings;
 
 use base qw(Item);
 
-sub get_ingredients {
-    my $self = shift;
-    return ( 'rock', 'wheat' );
-}
+sub get_ingredients { 'rock', 'wheat' }
 
 1;
