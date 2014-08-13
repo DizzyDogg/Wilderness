@@ -26,6 +26,7 @@ use Item::Log;
 use Item::Wheat;
 use Item::Venison;
 use Item::Branch;
+use Item::Fire;
 
 use Data::Dumper;
 

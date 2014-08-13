@@ -24,6 +24,9 @@ my %alternates = (
     attack  => 'kill',
     speak   => 'say',
     talk    => 'say',
+    create  => 'make',
+    craft   => 'make',
+    build   => 'make',
 );
 
 print "\n\nWelcome to the World of Awesome.\n";

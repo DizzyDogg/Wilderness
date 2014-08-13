@@ -71,7 +71,7 @@ sub drop {
     my $what = shift;
     my $here = $self->where();
     return warn "\tYou don't have a $what\n" unless $self->has($what);
-    $self->{'hidden'}->remove($what);
+    $self->inventory_remove($what) || $self->equipment_remove($what);
     $here->item_add($what);
     print "\tYou place the $what gently on the ground\n";
 }
@@ -151,6 +151,40 @@ sub say {
     print "\tYou mutter for a bit ... and realize you are talking to youself\n"
           ."\tYou decide that you can indeed still talk\n"
           ."\tBut, you shake your head and refocus your efforts on surviving\n";
+}
+
+sub recipe {
+    my $self = shift;
+    my $world = shift;
+    my $product = shift;
+    my @ingredients = $product->get_ingredients();
+    return warn "\tA $product is not something you know how to make\n" unless @ingredients;
+    my $recipe = "\tTo make a $product, you need\n";
+    foreach my $ingredient (@ingredients) {
+        $recipe .= "\t\tA $ingredient\n";
+    }
+    return warn "$recipe\n";
+}
+
+sub make {
+    my $self = shift;
+    my $world = shift;
+    my $product = shift;
+    my $here = $self->where();
+    my @ingredients = $product->get_ingredients();
+    my @lack;
+    foreach my $ingredient (@ingredients) {
+        push @lack, $ingredient unless $self->has($ingredient);
+    }
+    my $lack_string = join "\n\t\tA ", @lack;
+    if ( @lack ) {
+        return warn "\tTo make a $product, you still need\n" . "\t\tA $lack_string\n";
+    }
+    $here->item_add($product);
+    foreach my $ingredient ( @ingredients ) {
+        $self->give($world, $ingredient, 'to', $product);
+    }
+    print "\tCongratulations! You have just made a $product\n";
 }
 
 sub kill { shift->_kill(kill => @_) }

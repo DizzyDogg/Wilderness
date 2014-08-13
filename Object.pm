@@ -17,14 +17,16 @@ use overload
     '==' => sub {
         my $a = shift;
         my $b = shift;
-        return 0 unless ( ref $a && ref $b && $a->can('name') && $b->can('name') );
-        return $a->name() eq $b->name();
+        $a = $a->name() if (ref $a && $a->can('name'));
+        $b = $b->name() if (ref $b && $b->can('name'));
+        return $a eq $b;
     },
     'eq' => sub {
         my $a = shift;
         my $b = shift;
-        return 0 unless ( ref $a && ref $b && $a->can('name') && $b->can('name') );
-        return $a->name() eq $b->name();
+        $a = $a->name() if (ref $a && $a->can('name'));
+        $b = $b->name() if (ref $b && $b->can('name'));
+        return $a eq $b;
     };
 
 sub new {
@@ -54,6 +56,8 @@ sub describe {
     my $self = shift;
     return join ("\n\t", $default_description, $self->get_sub_description());
 }
+
+sub get_ingredient { return undef }
 
 sub get_sub_description {
     my $self = shift;

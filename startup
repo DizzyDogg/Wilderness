@@ -3,6 +3,7 @@ deer is Mob::Deer
 bird is Mob::Bird
 feather is Item::Feather
 venison is Item::Venison
+fire is Item::Fire
 tree is Spawner::Tree
 fillet is Item::Fillet
 mountain is Spawner::Mountain
