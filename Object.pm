@@ -88,16 +88,24 @@ sub get_sub_description {
 
 sub equip {
     my $self = shift;
+    my $world = shift;
     my $item = shift;
+    return warn "\tYou do not have a $item to equip\n" unless $self->has_in($item);
     $self->inventory_remove($item);
     $self->equipment_add($item);
+    print "\tYou take the $item out of your pack and place it in your hand\n";
+    return 1;
 }
 
 sub unequip {
     my $self = shift;
+    my $world = shift;
     my $item = shift;
+    return warn "\tYou do not have a $item equipped\n" unless $self->has_on($item);
     $self->equipment_remove($item);
     $self->inventory_add($item);
+    print "\tYou place the $item back in your pack\n";
+    return 1;
 }
 
 sub inventory_add {
