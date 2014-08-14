@@ -72,7 +72,7 @@ sub drop {
     my $here = $self->where();
     return warn "\tYou don't have a $what\n" unless $self->has($what);
     $self->inventory_remove($what) || $self->equipment_remove($what);
-    $here->item_add($what);
+    $here->add_item($what);
     print "\tYou place the $what gently on the ground\n";
 }
 
@@ -82,17 +82,17 @@ sub take {
     my $what = shift;
     my $here = $self->where();
     return warn "\tI don't know what a $what is\n" unless ref $what;
-    if ( $here->has_occupant($what) ) {
+    return warn "\tThere's no $what here\n" unless $here->has($what);
+    if ( $what->is_character() ) {
         print "\tSeriously? ... you really want that $what?\n";
         print "\tYou lonely? You want it as a pet or something?\n";
         print "\tProbably not the best idea\n";
         return;
     }
-    if ( $here->has_fixture($what) ) {
+    if ( $what->is_fixture() ) {
         return warn "\tThe $what is relatively permanent ... sorry\n";
     }
-    return warn "\tThere's no $what here\n" unless $here->has_item($what);
-    $here->item_remove($what);
+    $here->remove_item($what);
     $self->inventory_add($what);
     print "\tYou now have the $what\n";
 }
@@ -111,19 +111,13 @@ sub look {
 
         my @items = $here->get_items();
         foreach my $item ( @items ) {
+            next if $item eq $self;
             # my $how_many = $items->{$item} == 1 ? 'a' : $items->{$item};
             # $item .= 's' if $how_many ne 'a';
-            print "\tYou see a $item lying on the ground\n";
+            print "\tYou see a $item lying on the ground\n" if $item->is_item();
+            print "\tThere is a $item here\n" if $item->is_fixture();
+            print "\tA $item notices your presence\n" if $item->is_character();
         }
-        my @fixtures = $here->get_fixtures();
-        foreach my $fixture ( @fixtures) {
-            print "\tThere is a $fixture here\n";
-        }
-
-        my @chars = $here->get_occupants();
-        my @not_me = grep { "$_" ne "$self" } @chars;
-        print "\tA $_ notices your presence\n" foreach @not_me;
-
         my $exits = $here->get_exits();
         print ("\tThere are exits leading " . join(', ', keys %$exits) . "\n") if $exits;
     }
@@ -159,7 +153,7 @@ sub recipe {
     my $product = shift;
     return warn "\tI don't know what a $product is\n" unless ref $product;
     my @ingredients = $product->get_ingredients();
-    return warn "\tA $product is not something you know how to make\n" unless defined @ingredients;
+    return warn "\tA $product is not something you know how to make\n" unless @ingredients;
     my $recipe = "\tTo make a $product, you need\n";
     foreach my $ingredient (@ingredients) {
         $recipe .= "\t\tA $ingredient\n";
@@ -174,7 +168,7 @@ sub make {
     return warn "\tI don't know what a $product is\n" unless ref $product;
     my $here = $self->where();
     my @ingredients = $product->get_ingredients();
-    return warn "\tA $product is not something you know how to make\n" unless defined @ingredients;
+    return warn "\tA $product is not something you know how to make\n" unless @ingredients;
     my @lack;
     foreach my $ingredient (@ingredients) {
         push @lack, $ingredient unless $self->has($ingredient);
@@ -183,7 +177,7 @@ sub make {
     if ( @lack ) {
         return warn "\tTo make a $product, you still need\n" . "\t\tA $lack_string\n";
     }
-    $here->item_add($product);
+    $product->is_item() ? $self->inventory_add($product) : $here->add_item($product);
     foreach my $ingredient ( @ingredients ) {
         $self->give($world, $ingredient, 'to', $product);
     }
@@ -206,19 +200,21 @@ sub _kill {
     return warn "\tThe $baddie is not something that can be killed\n" unless $baddie->get_health();
     return warn "\tThere is no $baddie here\n" unless $baddie->where() eq $here;
     return warn "\tWhy would you kill the poor innocent $baddie?\n"
-                . "\tIt hasn't done anything to anyone\n" unless $here->has_occupant($baddie);
+                . "\tIt hasn't done anything to anyone\n" unless $baddie->is_character();
     return warn "\tUh ... I am pretty sure suicide is illegal\n"
                 . "\tand generally considered bad for your health\n" if $baddie == $self;
 
     # now we add its inventory to the room's inventory
     print "\u\tYou ${word}ed the $baddie\n";
+    print "\tYou watch as the $baddie blinks out of existence\n";
     my @loot = $baddie->get_all();
+    print "\t\tYou notice it has left:\n" if @loot;
     foreach my $item ( @loot ) {
-        $here->item_add($item);
-        warn "\tThe $baddie dropped $item on the ground\n";
+        $here->add_item($item);
+        warn "\t\tA $item\n";
     }
     # and eliminate it
-    $here->occupant_remove($baddie);
+    $here->remove_item($baddie);
     $world->delete($baddie);
 }
 

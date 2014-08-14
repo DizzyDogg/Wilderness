@@ -4,29 +4,30 @@ use strict;
 use warnings;
 
 use base qw(Object);
-use Mob::Deer;
-use Mob::Bird;
-use Fixture::Tree;
 use Fixture::Mountain;
-use Place;
-use Player;
+use Fixture::Tree;
+use Item::Branch;
+use Item::Bread;
 use Item::Fillet;
+use Item::Fire;
 use Item::Fish;
+use Item::FishingPole;
 use Item::Feather;
-use Item::Rock;
-use Item::String;
 use Item::Knife;
+use Item::Log;
+use Item::Map;
+use Item::Rock;
 use Item::Rope;
 use Item::Shovel;
-use Item::Bread;
-use Item::FishingPole;
 use Item::Stick;
+use Item::String;
 use Item::Twig;
-use Item::Log;
-use Item::Wheat;
 use Item::Venison;
-use Item::Branch;
-use Item::Fire;
+use Item::Wheat;
+use Mob::Bird;
+use Mob::Deer;
+use Place;
+use Player;
 
 use Data::Dumper;
 
@@ -53,23 +54,12 @@ sub initialize {
             my $it = $self->{'things'}{$subject};
             if ( $verb eq 'is' && $object[0] eq 'in' ) {
                 my $place = $self->{'things'}{$object[1]};
-                $place->occupant_add($it);
+                $place->add_item($it);
 
             }
-            elsif ( $verb eq 'contains' ) {
-                # my $item = $self->{'things'}{$object[0]};
-                # die Dumper $self;
-                $it->item_add($self->{'things'}{$object[0]}) || die "Cannot populate room items: $line\n";
-            }
-            elsif ( $verb eq 'inhabits' ) {
-                my $place = $self->{'things'}{$object[0]};
-                $place->fixture_add($it) || die "Cannot populate room fixtures: $line\n";
-            }
             elsif ( $verb eq 'has' ) {
-                $it->inventory_add($self->{'things'}{$object[0]}) || die "Cannot populate inventory: $line\n";
-            }
-            elsif ( $verb eq 'equips' ) {
-                $it->equipment_add($self->{'things'}{$object[0]}) || die "Cannot populate inventory: $line\n";
+                my $add = ($object[1] || '') eq 'equipped' ? 'equipment_add' : 'inventory_add';
+                $it->$add($self->{'things'}{$object[0]}) || die "Cannot add item: $line\n";
             }
             elsif ( $verb eq 'goes' ) {
                 $it->exit_add($object[0], $self->{'things'}{$object[2]}) || die "Cannot populate exits: $line\n";

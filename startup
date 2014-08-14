@@ -6,6 +6,8 @@ venison is Item::Venison
 fire is Item::Fire
 tree is Fixture::Tree
 fillet is Item::Fillet
+knife is Item::Knife
+map is Item::Map
 mountain is Fixture::Mountain
 forest is Place
 field is Place
@@ -32,18 +34,20 @@ branch is Item::Branch
 me is in plains
 bird is in field
 bird has feather
-river contains fish
+fish is in river
 fish has fillet
+me has knife equipped
+me has map
 deer is in forest
 deer has venison
-tree inhabits forest
-tree equips branch
+tree is in forest
+tree has branch equipped
 tree has log
 branch has log
-branch equips twig
-branch equips stick
-mountain contains rock
-plains contains wheat
+branch has twig equipped
+branch has stick equipped
+rock is in mountain
+wheat is in plains
 waterfall goes south to river
 waterfall goes west to mountain
 river goes north to waterfall

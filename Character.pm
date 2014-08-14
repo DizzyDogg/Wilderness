@@ -21,8 +21,8 @@ sub move_to {
     my $self = shift;
     my $where = shift;
     my $here = $self->where();
-    $here->occupant_remove($self);
-    $where->occupant_add($self);
+    $here->remove_item($self);
+    $where->add_item($self);
     return $self->{'location'} = $where;
 }
 

@@ -49,6 +49,13 @@ sub name {
     return $self->{'name'};
 }
 
+# Might alter this to check the location for the object, rather than this way
+# Will be necessary when more than one of an object exists
+# I think an is_here() sub might be best
+sub is_here {
+    my $self = shift;
+}
+
 sub where {
     my $self = shift;
     return $self->{'location'};
