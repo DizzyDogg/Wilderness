@@ -21,6 +21,7 @@ my %alternates = (
     walk    => 'go',
     travel  => 'go',
     move    => 'go',
+    exit    => 'go',
     attack  => 'kill',
     speak   => 'say',
     talk    => 'say',

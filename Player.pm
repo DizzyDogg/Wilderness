@@ -81,8 +81,12 @@ sub take {
     my $world = shift;
     my $what = shift;
     my $here = $self->where();
+    my @baddies = grep { $_->is_character() } $here->get_items();
     return warn "\tI don't know what a $what is\n" unless ref $what;
-    return warn "\tThere's no $what here\n" unless $here->has($what);
+    foreach my $baddie (@baddies) {
+        return warn "\tUmmm ... That is currently in someone else's possession\n" if $baddie->has_on($what);
+    }
+    return warn "\tThere's no $what here\n" unless $what->is_here($here);
     if ( $what->is_character() ) {
         print "\tSeriously? ... you really want that $what?\n";
         print "\tYou lonely? You want it as a pet or something?\n";
@@ -135,7 +139,7 @@ sub examine {
         return;
     }
     return warn "\tI have no idea what a $thing is\n" unless ref $thing;
-    return warn "\tYou cannot see a $thing\n" unless ( $self->has($thing) || $here->has($thing) );
+    return warn "\tYou cannot see a $thing\n" unless ( $self->has($thing) || $thing->is_here($here) );
     my $description = $thing->describe();
     return warn "\t$description\n";
 }

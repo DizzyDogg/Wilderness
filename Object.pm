@@ -49,11 +49,19 @@ sub name {
     return $self->{'name'};
 }
 
-# Might alter this to check the location for the object, rather than this way
-# Will be necessary when more than one of an object exists
-# I think an is_here() sub might be best
+# this is checking all items in the room and ALL their visible equipment (and theirs)
 sub is_here {
     my $self = shift;
+    my $place = shift;
+    my @items = $place->get_items();
+    foreach my $item (@items) {
+        return 1 if $item eq $self;
+        my @deep_items = $item->get_deep_equipment();
+        foreach my $deep_item (@deep_items) {
+            return 1 if $deep_item eq $self;
+        }
+    }
+    return 0;
 }
 
 sub where {
@@ -62,7 +70,6 @@ sub where {
 }
 
 my $default_description = 'There does not appear to be anything special about it';
-
 sub describe {
     my $self = shift;
     return join ("\n\t", $default_description, $self->get_sub_description());
@@ -126,6 +133,16 @@ sub get_inventory{
     return @items;
 }
 
+sub get_deep_inventory {
+    my $self = shift;
+    my @items = $self->get_inventory();
+    my @all_items;
+    foreach my $item (@items) {
+        push @all_items, $item->get_deep_inventory();
+    }
+    return @all_items;
+}
+
 sub equipment_add {
     my $self = shift;
     my $item = shift;
@@ -142,6 +159,16 @@ sub get_equipment{
     my $self = shift;
     my @items = $self->{'visible'}->get_all();
     return @items;
+}
+
+sub get_deep_equipment {
+    my $self = shift;
+    my @items = $self->get_equipment();
+    my @all_items;
+    foreach my $item (@items) {
+        push @all_items, $item->get_deep_equipment();
+    }
+    return @all_items;
 }
 
 sub get_all {

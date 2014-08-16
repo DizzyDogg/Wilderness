@@ -9,6 +9,8 @@ use Data::Dumper;
 
 sub is_character { return 1 }
 
+sub get_health { 1 }
+
 sub can_go {
     my $self = shift;
     my $direction = shift;
@@ -32,8 +34,6 @@ sub is_in {
     return $self->{'location'} eq $place;
 }
 
-sub get_health { 1 }
-
 sub has {
     my $self = shift;
     my $item = shift;
@@ -51,4 +51,5 @@ sub has_in {
     my $item = shift;
     return $self->{'hidden'}->contains($item);
 }
+
 1;

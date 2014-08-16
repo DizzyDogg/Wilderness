@@ -39,8 +39,8 @@ sub get_all {
 sub contains {
     my $self = shift;
     my $item = shift;
-    foreach my $i ( 0 .. scalar(@$self)-1 ) {
-        return 1 if $self->[$i] eq $item;
+    foreach my $object ( @$self ) {
+        return 1 if $object eq $item;
     }
     return 0;
 }
