@@ -86,7 +86,7 @@ sub take {
     foreach my $baddie (@baddies) {
         return warn "\tUmmm ... That is currently in someone else's possession\n" if $baddie->has_on($what);
     }
-    return warn "\tThere's no $what here\n" unless $what->is_here($here);
+    return warn "\tThere's no $what here\n" unless $self->can_see($what);
     if ( $what->is_character() ) {
         print "\tSeriously? ... you really want that $what?\n";
         print "\tYou lonely? You want it as a pet or something?\n";
@@ -96,8 +96,9 @@ sub take {
     if ( $what->is_fixture() ) {
         return warn "\tThe $what is relatively permanent ... sorry\n";
     }
+    return warn "\tThere is no $what to take\n" unless $self->can_reach($what);
     $here->remove_item($what);
-    $self->inventory_add($what);
+    return 0 unless $self->inventory_add($what);
     print "\tYou now have the $what\n";
 }
 
@@ -139,7 +140,7 @@ sub examine {
         return;
     }
     return warn "\tI have no idea what a $thing is\n" unless ref $thing;
-    return warn "\tYou cannot see a $thing\n" unless ( $self->has($thing) || $thing->is_here($here) );
+    return warn "\tYou cannot see a $thing\n" unless ( $self->has($thing) || $self->can_see($thing) );
     my $description = $thing->describe();
     return warn "\t$description\n";
 }

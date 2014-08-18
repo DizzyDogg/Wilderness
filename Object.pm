@@ -50,15 +50,33 @@ sub name {
 }
 
 # this is checking all items in the room and ALL their visible equipment (and theirs)
-sub is_here {
+sub can_see {
     my $self = shift;
-    my $place = shift;
+    my $thing = shift;
+    my $place = $self->where();
     my @items = $place->get_items();
     foreach my $item (@items) {
-        return 1 if $item eq $self;
+        return 1 if $item eq $thing;
         my @deep_items = $item->get_deep_equipment();
         foreach my $deep_item (@deep_items) {
-            return 1 if $deep_item eq $self;
+            return 1 if $deep_item eq $thing;
+        }
+    }
+    return 0;
+}
+
+# Same as is_here, but skipping characters and their equipment.
+sub can_reach {
+    my $self = shift;
+    my $thing = shift;
+    my $place = $self->where();
+    my @items = $place->get_items();
+    foreach my $item (@items) {
+        next if $item->is_character();
+        return 1 if $item eq $thing;
+        my @deep_items = $item->get_deep_equipment();
+        foreach my $deep_item (@deep_items) {
+            return 1 if $deep_item eq $thing;
         }
     }
     return 0;
@@ -118,7 +136,8 @@ sub unequip {
 sub inventory_add {
     my $self = shift;
     my $item = shift;
-    $self->{'hidden'}->add($item);
+    my $added = $self->{'hidden'}->add($item);
+    return $added;
 }
 
 sub inventory_remove {
@@ -152,7 +171,17 @@ sub equipment_add {
 sub equipment_remove {
     my $self = shift;
     my $item = shift;
-    $self->{'visible'}->remove($item);
+    my $removed = $self->{'visible'}->remove($item);
+    if ( $removed ) {
+        delete $item->{'location'};
+    }
+    else {
+        my @objects = $self->get_equipment();
+        foreach my $object (@objects) {
+            last if $removed = $object->equipment_remove($item);
+        }
+    }
+    return $removed;
 }
 
 sub get_equipment{
@@ -165,6 +194,7 @@ sub get_deep_equipment {
     my $self = shift;
     my @items = $self->get_equipment();
     my @all_items;
+    push @all_items, @items;
     foreach my $item (@items) {
         push @all_items, $item->get_deep_equipment();
     }

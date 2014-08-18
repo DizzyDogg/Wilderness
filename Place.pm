@@ -25,7 +25,15 @@ sub remove_item {
     my $self = shift;
     my $item = shift;
     my $removed = $self->{'visible'}->remove($item);
-    delete $item->{'location'} if $removed;
+    if ( $removed ) {
+        delete $item->{'location'};
+    }
+    else {
+        my @objects = $self->get_items();
+        foreach my $object (@objects) {
+            last if $removed = $object->equipment_remove($item);
+        }
+    }
     return $removed;
 }
 

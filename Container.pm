@@ -28,7 +28,7 @@ sub remove {
     foreach my $i ( 0 .. scalar(@$self)-1 ) {
         return my ($a) = splice(@$self, $i, 1) if $self->[$i] == $item;
     }
-    return warn "\tThere is no $item to remove\n";
+    return 0;
 }
 
 sub get_all {
