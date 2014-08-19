@@ -23,13 +23,14 @@ sub add_item {
 
 sub remove_item {
     my $self = shift;
+    my $player = shift;
     my $item = shift;
     my $removed = $self->{'visible'}->remove($item);
     if ( $removed ) {
         delete $item->{'location'};
     }
     else {
-        my @objects = $self->get_items();
+        my @objects = ($self->get_items(), $player->get_inventory());
         foreach my $object (@objects) {
             last if $removed = $object->equipment_remove($item);
         }

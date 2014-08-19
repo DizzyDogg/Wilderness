@@ -23,7 +23,7 @@ sub move_to {
     my $self = shift;
     my $where = shift;
     my $here = $self->where();
-    $here->remove_item($self);
+    $where->remove_item($self, $self);
     $where->add_item($self);
     return $self->{'location'} = $where;
 }

@@ -55,6 +55,7 @@ sub can_see {
     my $thing = shift;
     my $place = $self->where();
     my @items = $place->get_items();
+    push @items, $self->get_inventory();
     foreach my $item (@items) {
         return 1 if $item eq $thing;
         my @deep_items = $item->get_deep_equipment();
@@ -71,6 +72,7 @@ sub can_reach {
     my $thing = shift;
     my $place = $self->where();
     my @items = $place->get_items();
+    push @items, $self->get_inventory(), $self->get_equipment();
     foreach my $item (@items) {
         next if $item->is_character();
         return 1 if $item eq $thing;
@@ -156,6 +158,7 @@ sub get_deep_inventory {
     my $self = shift;
     my @items = $self->get_inventory();
     my @all_items;
+    push @all_items, @items;
     foreach my $item (@items) {
         push @all_items, $item->get_deep_inventory();
     }

@@ -71,7 +71,7 @@ sub drop {
     my $what = shift;
     my $here = $self->where();
     return warn "\tYou don't have a $what\n" unless $self->has($what);
-    $self->inventory_remove($what) || $self->equipment_remove($what);
+    $self->selfntory_remove($what) || $self->equipment_remove($what);
     $here->add_item($what);
     print "\tYou place the $what gently on the ground\n";
 }
@@ -84,7 +84,7 @@ sub take {
     my @baddies = grep { $_->is_character() } $here->get_items();
     return warn "\tI don't know what a $what is\n" unless ref $what;
     foreach my $baddie (@baddies) {
-        return warn "\tUmmm ... That is currently in someone else's possession\n" if $baddie->has_on($what);
+        return warn "\tUmmm ... That is currently in someone's possession\n" if $baddie->has_on($what);
     }
     return warn "\tThere's no $what here\n" unless $self->can_see($what);
     if ( $what->is_character() ) {
@@ -97,7 +97,7 @@ sub take {
         return warn "\tThe $what is relatively permanent ... sorry\n";
     }
     return warn "\tThere is no $what to take\n" unless $self->can_reach($what);
-    $here->remove_item($what);
+    return warn "\tYou already have the $what\n" unless $here->remove_item($self, $what);
     return 0 unless $self->inventory_add($what);
     print "\tYou now have the $what\n";
 }
@@ -220,7 +220,7 @@ sub _kill {
         warn "\t\tA $item\n";
     }
     # and eliminate it
-    $here->remove_item($baddie);
+    $here->remove_item($self, $baddie);
     $world->delete($baddie);
 }
 
