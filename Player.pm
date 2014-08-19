@@ -24,7 +24,7 @@ sub give {
     return warn "\tGive $item to whom?\n" unless ref $receiver;
     # see if this warn spews on characters that do not exist anywhere
     return warn "\tSorry ... there is no $receiver here\n"
-        unless $receiver->where() eq $self->where();
+        unless ( $self->has($receiver) or ( $receiver->where() eq $self->where() ) );
 
     $self->{'hidden'}->remove($item);
     $receiver->{'hidden'}->add($item);
