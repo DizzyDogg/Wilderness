@@ -71,7 +71,7 @@ sub drop {
     my $what = shift;
     my $here = $self->where();
     return warn "\tYou don't have a $what\n" unless $self->has($what);
-    $self->selfntory_remove($what) || $self->equipment_remove($what);
+    $self->inventory_remove($what) || $self->equipment_remove($what);
     $here->add_item($what);
     print "\tYou place the $what gently on the ground\n";
 }
