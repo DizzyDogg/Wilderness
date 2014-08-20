@@ -156,6 +156,7 @@ sub recipe {
     my $self = shift;
     my $world = shift;
     my $product = shift;
+    return warn "\tWhich recipe would you like to see?\n" unless $product;
     return warn "\tI don't know what a $product is\n" unless ref $product;
     my @ingredients = $product->get_ingredients();
     my @tools = $product->get_tools();
