@@ -28,7 +28,7 @@ sub give {
 
     $self->{'hidden'}->remove($item);
     $receiver->{'hidden'}->add($item);
-    print "\t$self gave the $item to the $receiver\n";
+    print "\tYou say 'goodbye' as you part with the $item, holding back the tears\n";
 }
 
 sub go {
@@ -158,10 +158,15 @@ sub recipe {
     my $product = shift;
     return warn "\tI don't know what a $product is\n" unless ref $product;
     my @ingredients = $product->get_ingredients();
+    my @tools = $product->get_tools();
     return warn "\tA $product is not something you know how to make\n" unless @ingredients;
-    my $recipe = "\tTo make a $product, you need\n";
+    my $recipe = "\tMaking a $product requires\n";
     foreach my $ingredient (@ingredients) {
         $recipe .= "\t\tA $ingredient\n";
+    }
+    $recipe .= "\t\tAs well as access to\n" if @tools;
+    foreach my $tool (@tools) {
+        $recipe .= "\t\tA $tool\n";
     }
     return warn "$recipe";
 }
@@ -170,13 +175,17 @@ sub make {
     my $self = shift;
     my $world = shift;
     my $product = shift;
-    return warn "\tI don't know what a $product is\n" unless ref $product;
     my $here = $self->where();
     my @ingredients = $product->get_ingredients();
+    my @tools = $product->get_tools();
+    return warn "\tI don't know what a $product is\n" unless ref $product;
     return warn "\tA $product is not something you know how to make\n" unless @ingredients;
     my @lack;
     foreach my $ingredient (@ingredients) {
         push @lack, $ingredient unless $self->has($ingredient);
+    }
+    foreach my $tool (@tools) {
+        push @lack, $tool unless $self->can_reach($tool);
     }
     my $lack_string = join "\n\t\tA ", @lack;
     if ( @lack ) {
@@ -186,7 +195,8 @@ sub make {
     foreach my $ingredient ( @ingredients ) {
         $self->give($world, $ingredient, 'to', $product);
     }
-    print "\tCongratulations! You have just made a $product\n";
+    my $process = $product->process();
+    return warn "\t$process\n";
 }
 
 sub kill { shift->_kill(kill => @_) }

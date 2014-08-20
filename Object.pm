@@ -89,13 +89,22 @@ sub where {
     return $self->{'location'};
 }
 
-my $default_description = 'There does not appear to be anything special about it';
+sub _desc {
+    return 'There does not appear to be anything special about it';
+}
+
 sub describe {
     my $self = shift;
-    return join ("\n\t", $default_description, $self->get_sub_description());
+    return join ("\n\t", $self->_desc(), $self->get_sub_description());
+}
+
+sub process {
+    my $self = shift;
+    return "Congratulations! You have just made a $self"
 }
 
 sub get_ingredients { return }
+sub get_tools { return }
 
 sub get_sub_description {
     my $self = shift;

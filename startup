@@ -3,6 +3,10 @@ deer is Mob::Deer
 bird is Mob::Bird
 feather is Item::Feather
 venison is Item::Venison
+handaxe is Item::HandAxe
+hide is Item::Hide
+bow is Item::Bow
+cord is Item::Cord
 fire is Item::Fire
 tree is Fixture::Tree
 fillet is Item::Fillet
@@ -40,11 +44,13 @@ me has knife equipped
 me has map
 deer is in forest
 deer has venison
+deer has hide
 tree is in forest
 tree has branch equipped
 tree has log
 branch has log
 branch has twig equipped
+branch has stick equipped
 branch has stick equipped
 rock is in mountain
 wheat is in plains
