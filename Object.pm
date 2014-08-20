@@ -117,6 +117,9 @@ sub equip {
     my $self = shift;
     my $world = shift;
     my $item = shift;
+    return warn "\tWhat would you like to equip?\n" unless $item;
+    return warn "\tI do not know what a $item is\n" unless ref $item;
+    return warn "\tYou already have a $item equipped\n" if $self->has_on($item);
     return warn "\tYou do not have a $item to equip\n" unless $self->has_in($item);
     $self->inventory_remove($item);
     $self->equipment_add($item);
@@ -128,6 +131,8 @@ sub unequip {
     my $self = shift;
     my $world = shift;
     my $item = shift;
+    return warn "\tWhat would you like to unequip?\n" unless $item;
+    return warn "\tI do not know what a $item is\n" unless ref $item;
     return warn "\tYou do not have a $item equipped\n" unless $self->has_on($item);
     $self->equipment_remove($item);
     $self->inventory_add($item);
