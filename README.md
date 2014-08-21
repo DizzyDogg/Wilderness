@@ -6,7 +6,25 @@ Feel free to test it out for me and give me some feedback on features/bugs you w
 
 ## Instructions:
 
-Run the following command to run the game:
+Run the following command to start the game:
 ```
 ./play
 ```
+
+You can run commands such as:
+```
+go north
+```
+or
+```
+get branch
+```
+or
+```
+look at branch
+```
+or
+```
+make hammer
+```
+
