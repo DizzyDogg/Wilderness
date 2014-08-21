@@ -4,32 +4,7 @@ use strict;
 use warnings;
 
 use base qw(Object);
-use Fixture::Mountain;
-use Fixture::Tree;
-use Item::Branch;
-use Item::Bow;
-use Item::Bread;
-use Item::Cord;
-use Item::Fillet;
-use Item::Fire;
-use Item::Fish;
-use Item::FishingPole;
-use Item::Feather;
-use Item::HandAxe;
-use Item::Hide;
-use Item::Knife;
-use Item::Log;
-use Item::Map;
-use Item::Rock;
-use Item::Rope;
-use Item::Shovel;
-use Item::Stick;
-use Item::String;
-use Item::Twig;
-use Item::Venison;
-use Item::Wheat;
-use Mob::Bird;
-use Mob::Deer;
+use Container;
 use Place;
 use Player;
 
@@ -51,7 +26,7 @@ sub initialize {
         # NOTE: all 'things' must declare their thingness FIRST in the startup file
         # They may gain an inventory, location, etc. after that.
         if ( $verb eq 'is' && $object[0] ne 'in') {
-            $self->{'things'}{$subject} = $object[0]->new(name => $subject);
+            $self->{'things'}{$subject} = Object::new($object[0], name => $subject);
             $self->{'things'}{$subject}{'name'} = $subject;
         }
         else {

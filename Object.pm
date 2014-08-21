@@ -32,6 +32,8 @@ use overload
 sub new {
     my $package = shift;
     my $self = {@_};
+    (my $path = $package) =~ s/::/\//;
+    require "$path.pm";
     $self->{'hidden'} = Container->new();
     $self->{'visible'} = Container->new();
     bless $self, $package;
