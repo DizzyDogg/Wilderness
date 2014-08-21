@@ -1,6 +1,7 @@
 me is Player
 deer is Mob::Deer
 bird is Mob::Bird
+hammer is Item::Hammer
 feather is Item::Feather
 venison is Item::Venison
 handaxe is Item::HandAxe
