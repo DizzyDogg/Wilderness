@@ -1,4 +1,4 @@
-me is Player
+you is Player
 deer is Mob::Deer
 bird is Mob::Bird
 hammer is Item::Hammer
@@ -13,6 +13,7 @@ tree is Fixture::Tree
 fillet is Item::Fillet
 knife is Item::Knife
 map is Item::Map
+axe is Item::Axe
 mountain is Fixture::Mountain
 forest is Place
 field is Place
@@ -36,13 +37,13 @@ stick is Item::Stick
 twig is Item::Twig
 fishingpole is Item::FishingPole
 branch is Item::Branch
-me is in plains
+you is in plains
 bird is in field
 bird has feather
 fish is in river
 fish has fillet
-me has knife equipped
-me has map
+you has knife equipped
+you has map
 deer is in forest
 deer has venison
 deer has hide

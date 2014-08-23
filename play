@@ -10,7 +10,7 @@ use Player;
 my $world= World->new(name => 'Awesome');
 $world->initialize();
 
-my $player = $world->{'things'}{'me'};
+my $player = $world->{'things'}{'you'};
 
 my %alternates = (
     have    => 'inventory',
