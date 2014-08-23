@@ -73,7 +73,7 @@ sub has_can_damage {
         return 1 if $equip->can_damage($item);
     }
     warn "\tYou have nothing equipped strong enough to affect the $item\n";
-    return 0;
+    return;
 }
 
 sub can_damage {

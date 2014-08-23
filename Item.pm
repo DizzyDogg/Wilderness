@@ -9,4 +9,10 @@ sub damage { return 1 }
 
 sub is_item { 1 }
 
+sub prior_action {
+    my $self = shift;
+    my $do = $self->required_action();
+    return "\tFirst you must $do the $self\n";
+}
+
 1;

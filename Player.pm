@@ -74,10 +74,11 @@ sub chop {
     my $saw = $self->can_see($item);
     return warn "\tYou cannot see any $item\n" unless $saw;
     return warn "\tThe $item is already on the ground\n" if $saw == 1 && $item->is_item();
-    if ( $item->is_choppable() ) {
-        $saw->drop($world, $item) if $self->has_can_damage($item);
+    if ( $item->is_choppable() && $self->has_can_damage($item) ) {
+        $saw->drop($world, $item);
         return warn "\tYou successfully chopped down the $item\n";
     }
+    return warn "\tYou were unable to chop down the $item\n";
 }
 
 sub take {
@@ -101,9 +102,8 @@ sub take {
         return warn "\tThe $what is relatively permanent ... sorry\n";
     }
     return warn "\tThe $what is not somewhere you can reach\n" unless $self->can_reach($what);
-    return warn "\tYou are not capable of taking the $what in its current state\n"
-              . "\tThere is something you must do to it before you may have it\n"
-              unless $saw == 1 || ! $what->has_requirements();
+    return warn "\tYou are not capable of taking the $what in its current state.\n"
+              . $what->prior_action() unless $saw == 1 || ! $what->has_requirements();
     return warn "\tYou already have the $what\n" unless $here->remove_item($self, $what);
     return 0 unless $self->inventory_add($what);
     print "\tYou now have the $what\n";
