@@ -43,12 +43,47 @@ sub new {
 sub is_item { return }
 sub is_character { return }
 sub is_fixture { return }
+sub is_player { return }
+sub is_choppable { return }
 
 sub get_health { undef }
 
 sub name {
     my $self = shift;
     return $self->{'name'};
+}
+
+sub required_sharpness { 0 }
+sub required_weight { 0 }
+sub sharpness { 0 }
+sub weight { 0 }
+
+sub has_requirements {
+    my $self = shift;
+    return $self->required_sharpness()
+        || $self->required_weight()
+        ;
+}
+
+sub has_can_damage {
+    my $self = shift;
+    my $item = shift;
+    my @equips = $self->get_equipment();
+    foreach my $equip (@equips) {
+        return 1 if $equip->can_damage($item);
+    }
+    warn "\tYou have nothing equipped strong enough to affect the $item\n";
+    return 0;
+}
+
+sub can_damage {
+    my $self = shift;
+    my $victim = shift;
+    my $sharp = $self->sharpness();
+    my $weight = $self->weight();
+    my $req_sharp = $victim->required_sharpness();
+    my $req_weight = $victim->required_weight();
+    return $sharp >= $req_sharp && $weight >= $req_weight;
 }
 
 # this is checking all items in the room and ALL their visible equipment (and theirs)
@@ -62,7 +97,7 @@ sub can_see {
         return 1 if $item eq $thing;
         my @deep_items = $item->get_deep_equipment();
         foreach my $deep_item (@deep_items) {
-            return 1 if $deep_item eq $thing;
+            return $item if $deep_item eq $thing;
         }
     }
     return 0;
@@ -84,6 +119,35 @@ sub can_reach {
         }
     }
     return 0;
+}
+
+sub drop {
+    my $self = shift;
+    my $world = shift;
+    my $what = shift;
+    my $here = $self->where();
+    return warn "\tYou don't have a $what\n" unless $self->has($what);
+    $self->inventory_remove($what) || $self->equipment_remove($what);
+    $here->add_item($what);
+    print "\tYou place the $what gently on the ground\n" if $self->is_player();
+}
+
+sub has {
+    my $self = shift;
+    my $item = shift;
+    return ( $self->has_on($item) || $self->has_in($item) ) ? 1 : 0;
+}
+
+sub has_on {
+    my $self = shift;
+    my $item = shift;
+    return $self->{'visible'}->contains($item);
+}
+
+sub has_in {
+    my $self = shift;
+    my $item = shift;
+    return $self->{'hidden'}->contains($item);
 }
 
 sub where {

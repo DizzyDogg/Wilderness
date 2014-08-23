@@ -16,6 +16,8 @@ sub quit {
     warn "\tI hope you enjoyed your stay in the Wilderness of Awesome !!!\n";
     exit }
 
+sub is_player { 1 }
+
 sub give {
     my ($self, $world, $item, $to, $receiver) = @_;
     return warn "\tGive what to whom?\n" unless $item;
@@ -65,15 +67,17 @@ sub inventory {
     }
 }
 
-sub drop {
+sub chop {
     my $self = shift;
     my $world = shift;
-    my $what = shift;
-    my $here = $self->where();
-    return warn "\tYou don't have a $what\n" unless $self->has($what);
-    $self->inventory_remove($what) || $self->equipment_remove($what);
-    $here->add_item($what);
-    print "\tYou place the $what gently on the ground\n";
+    my $item = shift;
+    my $saw = $self->can_see($item);
+    return warn "\tYou cannot see any $item\n" unless $saw;
+    return warn "\tThe $item is already on the ground\n" if $saw == 1 && $item->is_item();
+    if ( $item->is_choppable() ) {
+        $saw->drop($world, $item) if $self->has_can_damage($item);
+        return warn "\tYou successfully chopped down the $item\n";
+    }
 }
 
 sub take {
@@ -86,7 +90,7 @@ sub take {
     foreach my $baddie (@baddies) {
         return warn "\tUmmm ... That is currently in someone's possession\n" if $baddie->has_on($what);
     }
-    return warn "\tThere's no $what here\n" unless $self->can_see($what);
+    return warn "\tThere's no $what here\n" unless my $saw = $self->can_see($what);
     if ( $what->is_character() ) {
         print "\tSeriously? ... you really want that $what?\n";
         print "\tYou lonely? You want it as a pet or something?\n";
@@ -96,7 +100,10 @@ sub take {
     if ( $what->is_fixture() ) {
         return warn "\tThe $what is relatively permanent ... sorry\n";
     }
-    return warn "\tThere is no $what to take\n" unless $self->can_reach($what);
+    return warn "\tThe $what is not somewhere you can reach\n" unless $self->can_reach($what);
+    return warn "\tYou are not capable of taking the $what in its current state\n"
+              . "\tThere is something you must do to it before you may have it\n"
+              unless $saw == 1 || ! $what->has_requirements();
     return warn "\tYou already have the $what\n" unless $here->remove_item($self, $what);
     return 0 unless $self->inventory_add($what);
     print "\tYou now have the $what\n";
@@ -140,7 +147,7 @@ sub examine {
         return;
     }
     return warn "\tI have no idea what a $thing is\n" unless ref $thing;
-    return warn "\tYou cannot see a $thing\n" unless ( $self->has($thing) || $self->can_see($thing) );
+    return warn "\tYou cannot see a $thing\n" unless $self->can_see($thing);
     my $description = $thing->describe();
     return warn "\t$description\n";
 }
