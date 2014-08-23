@@ -11,7 +11,7 @@ sub _desc {
     . "\tIt can be used for building and for destroying. Use with care.";
 }
 
-sub get_ingredients { qw(rock stick) }
+sub get_ingredients { qw(rock stick cord) }
 
 sub get_tools {  }
 
