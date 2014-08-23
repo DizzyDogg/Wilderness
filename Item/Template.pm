@@ -6,15 +6,27 @@ use warnings;
 use base qw(Item);
 
 sub _desc {
-    return "";
+    return "Descripton of what this item is.\n"
+        .  "\tThis description is what the player sees\n"
+        .  "\twhen they 'look' at it";
 }
 
-sub get_ingredients {  }
+# components added into the creation of this item
+sub get_ingredients { qw(item1 item2 item3) }
 
-sub get_tools {  }
+# tools requipred (not consumed) in the crafting of this item
+sub get_tools { qw(tool1 tool2) }
+
+# requirements to free up this item so it can be obtained
+# sub required_sharpness { 10 }
+# sub required_weight { 5 }
+
+# abilities of this item
+# sub sharpness { 10 }
+# sub weight { 5 }
 
 sub process {
-    return "";
-}
+    return "Description of how this item can be crafted.\n"
+        .  "\tThis will display when a player 'crafts' this item\n";
 
 1;
