@@ -28,6 +28,7 @@ my %alternates = (
     create  => 'make',
     craft   => 'make',
     build   => 'make',
+    place   => 'put',
 );
 
 print "\n\nWelcome to the World of Awesome.\n";
@@ -54,6 +55,7 @@ sub prompt {
     print "\nWhat would you like to do? ";
     my $command = <STDIN>;
     chomp $command;
+    $command = lc $command;
     $command =~ s/\bthe\b//;
     $command =~ s/\ba\b//;
     $command =~ s/\bat\b//;
