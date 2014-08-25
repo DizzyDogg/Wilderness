@@ -33,7 +33,11 @@ my %alternates = (
 print "\n\nWelcome to the World of Awesome.\n";
 print "Do you have what it takes to survive?\n\n";
 
+# The introductory statement
 $player->look($world);
+print "\n";
+$player->inventory($world);
+
 
 while ( my ($verb, @arguments) = prompt() ) {
     if ( my $m = $player->can($alternates{$verb} || $verb) ) {
