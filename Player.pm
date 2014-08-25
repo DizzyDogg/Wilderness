@@ -81,6 +81,30 @@ sub chop {
     return warn "\tYou were unable to chop down the $item\n";
 }
 
+sub put {
+    my $self = shift;
+    my $world = shift;
+    my ($thing, $in_on, $receiver) = @_;
+    return warn "\tPut what on or in what?\n" unless $thing;
+    return warn "\tYou need to put $thing on or in something\n" unless $in_on;
+    return warn "\tWhat would you like to put $thing $in_on?\n" unless $receiver;
+    return warn "\tI do not know what a $thing is\n" unless ref $thing;
+    return warn "\tYou can only put things 'on' or 'in' other things\n" unless ($in_on eq 'on' || $in_on eq 'in');
+    return warn "\tYou cannot put $thing $in_on itself ... Silly Goose\n"
+            .   "\tWhat does that even mean? What would that even look like?\n"
+            .   "\tYou know what? No ... Just NO!\n" if $thing eq $receiver;
+    return warn "\tI do not know what a $receiver is\n" unless ref $receiver;
+    return warn "\tYou do not have a $thing to put $in_on that $receiver\n" unless $self->has($thing);
+    return warn "\tYou cannot see a $receiver here\n" unless $self->can_see($receiver);
+    my $lost = $self->equipment_remove($thing) || $self->inventory_remove($thing);
+    if ( $lost ) {
+        $receiver->inventory_add($thing) if $in_on eq 'in';
+        $receiver->equipment_add($thing) if $in_on eq 'on';
+    }
+    print "\tYou carefully put the $thing $in_on the $receiver\n";
+    return;
+}
+
 sub take {
     my $self = shift;
     my $world = shift;
