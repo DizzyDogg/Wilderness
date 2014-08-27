@@ -18,6 +18,16 @@ sub quit {
 
 sub is_player { 1 }
 
+sub str2obj {
+    my $self = shift;
+    my @args = @_;
+    my @objs;
+    foreach my $str (@args) {
+        push @objs, $player->can_see($str) || $str;
+    }
+    return @objs;
+}
+
 sub give {
     my ($self, $world, $item, $to, $receiver) = @_;
     return warn "\tGive what to whom?\n" unless $item;

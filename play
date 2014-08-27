@@ -10,7 +10,7 @@ use Player;
 my $world= World->new(name => 'Awesome');
 $world->initialize();
 
-my $player = $world->{'things'}{'you'};
+my $player = Player->new();
 
 my %alternates = (
     have    => 'inventory',
@@ -42,7 +42,7 @@ $player->inventory($world);
 
 while ( my ($verb, @arguments) = prompt() ) {
     if ( my $m = $player->can($alternates{$verb} || $verb) ) {
-        my @args = string2obj(@arguments);
+        my @args = $player->str2obj(@arguments);
         $player->$m($world, @args);
     }
     else {
@@ -60,13 +60,4 @@ sub prompt {
     $command =~ s/\ba\b//;
     $command =~ s/\bat\b//;
     return split /\s+/, $command;
-}
-
-sub string2obj {
-    my @strings = @_;
-    my @objects;
-    foreach my $string ( @strings ) {
-        push @objects, $world->{'things'}{$string} || $string;
-    }
-    return @objects;
 }
