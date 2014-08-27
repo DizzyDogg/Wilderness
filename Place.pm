@@ -5,11 +5,9 @@ use warnings;
 
 use base qw(Object);
 
-sub new {
-    my $package = shift;
-    my $self = {@_};
-    $self->{'visible'} = Container->new();
-    bless $self, $package;
+sub initialize {
+    my $self = shift;
+    delete $self->{'hidden'};
     return $self;
 }
 

@@ -37,8 +37,11 @@ sub new {
     $self->{'hidden'} = Container->new();
     $self->{'visible'} = Container->new();
     bless $self, $package;
+    $self->initialize();
     return $self;
 }
+
+sub initialize { }
 
 sub is_item { return }
 sub is_character { return }
@@ -84,23 +87,6 @@ sub can_damage {
     my $req_sharp = $victim->required_sharpness();
     my $req_weight = $victim->required_weight();
     return $sharp >= $req_sharp && $weight >= $req_weight;
-}
-
-# this is checking all items in the room and ALL their visible equipment (and theirs)
-sub can_see {
-    my $self = shift;
-    my $thing = shift;
-    my $place = $self->where();
-    my @items = $place->get_items();
-    push @items, $self->get_inventory();
-    foreach my $item (@items) {
-        return 1 if $item eq $thing;
-        my @deep_items = $item->get_deep_equipment();
-        foreach my $deep_item (@deep_items) {
-            return $item if $deep_item eq $thing;
-        }
-    }
-    return 0;
 }
 
 # Same as is_here, but skipping characters and their equipment.
