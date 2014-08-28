@@ -23,7 +23,7 @@ sub str2obj {
     my @args = @_;
     my @objs;
     foreach my $str (@args) {
-        push @objs, $player->can_see($str) || $str;
+        push @objs, $self->can_see($str) || $str;
     }
     return @objs;
 }
@@ -81,11 +81,13 @@ sub chop {
     my $self = shift;
     my $world = shift;
     my $item = shift;
-    my $saw = $self->can_see($item);
-    return warn "\tYou cannot see any $item\n" unless $saw;
-    return warn "\tThe $item is already on the ground\n" if $saw == 1 && $item->is_item();
-    if ( $item->is_choppable() && $self->has_can_damage($item) ) {
-        $saw->drop($world, $item);
+    my $here = $self->where();
+    my @containers = $self->visible_containers($item);
+    return warn "\tYou cannot see any $item\n" unless $self->can_see($item);
+    return warn "\tA $item is not something that can be chopped\n" unless $item->is_choppable();
+    return warn "\tThe $item is not in a choppable state\n" if $item->is_item() && $here->has_on_ground($item);
+    if ( $self->has_can_damage($item) ) {
+        $containers[1]->drop($world, $item);
         return warn "\tYou successfully chopped down the $item\n";
     }
     return warn "\tYou were unable to chop down the $item\n";
@@ -125,7 +127,7 @@ sub take {
     foreach my $baddie (@baddies) {
         return warn "\tUmmm ... That is currently in someone's possession\n" if $baddie->has_on($what);
     }
-    return warn "\tThere's no $what here\n" unless my $saw = $self->can_see($what);
+    return warn "\tThere's no $what here\n" unless $self->can_see($what);
     if ( $what->is_character() ) {
         print "\tSeriously? ... you really want that $what?\n";
         print "\tYou lonely? You want it as a pet or something?\n";
@@ -137,7 +139,7 @@ sub take {
     }
     return warn "\tThe $what is not somewhere you can reach\n" unless $self->can_reach($what);
     return warn "\tYou are not capable of taking the $what in its current state.\n"
-              . $what->prior_action() unless $saw == 1 || ! $what->has_requirements();
+              . $what->prior_action() unless ($self->visible_containers($what))[-1] == $here || ! $what->has_requirements();
     return warn "\tYou already have the $what\n" unless $here->remove_item($self, $what);
     return 0 unless $self->inventory_add($what);
     print "\tYou now have the $what\n";
