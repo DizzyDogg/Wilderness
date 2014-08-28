@@ -5,6 +5,8 @@ use warnings;
 
 use base qw(Object);
 
+sub is_place { 1 }
+
 sub initialize {
     my $self = shift;
     delete $self->{'hidden'};
