@@ -47,6 +47,10 @@ sub is_item { return }
 sub is_character { return }
 sub is_fixture { return }
 sub is_player { return }
+sub is_place { return }
+sub is_biome { return }
+
+#find a way to check the 'required_action' instead of 'is_choppable'
 sub is_choppable { return }
 
 sub get_health { undef }
@@ -98,10 +102,10 @@ sub can_reach {
     push @items, $self->get_inventory(), $self->get_equipment();
     foreach my $item (@items) {
         next if $item->is_character();
-        return 1 if $item eq $thing;
+        return $item if $item eq $thing;
         my @deep_items = $item->get_deep_equipment();
         foreach my $deep_item (@deep_items) {
-            return 1 if $deep_item eq $thing;
+            return $deep_item if $deep_item eq $thing;
         }
     }
     return 0;
@@ -268,6 +272,26 @@ sub get_deep_equipment {
         push @all_items, $item->get_deep_equipment();
     }
     return @all_items;
+}
+
+sub visible_containers {
+    my $self = shift;
+    my $find = shift;
+    my $place = $self->where();
+    return $self if $find == $self;
+    my @items = $self->get_equipment();
+    foreach my $item (@items) {
+        my @deep_items = $item->visible_containers();
+        return (@deep_items, $self) if @deep_items;
+    }
+    return 0;
+}
+
+sub has_on_ground {
+    my $place = shift;
+    my $item = shift;
+    my @containers = $place->visible_containers($item);
+    return $containers[1] == $place;
 }
 
 sub get_all {

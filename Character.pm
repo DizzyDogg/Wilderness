@@ -34,4 +34,12 @@ sub is_in {
     return $self->{'location'} eq $place;
 }
 
+# this is checking all items in the room and ALL their visible equipment (and theirs)
+sub can_see {
+    my $self = shift;
+    my $thing = shift;
+    my $here = $self->where();
+    my ($object) = $self->{'hidden'}->visible_containers($thing) || $here->visible_containers($thing);
+}
+
 1;
