@@ -25,7 +25,6 @@ sub move_to {
     my $here = $self->where();
     $where->remove_item($self);
     $where->add_item($self);
-    return $self->{'location'} = $where;
 }
 
 sub is_in {

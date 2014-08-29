@@ -27,7 +27,7 @@ sub remove_item {
     my $self = shift;
     my $item = shift;
     my $removed = $self->{'visible'}->remove($item);
-    return $remove;
+    return $removed;
 }
 
 sub has {

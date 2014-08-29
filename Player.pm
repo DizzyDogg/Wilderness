@@ -6,6 +6,7 @@ use warnings;
 use base qw(Character);
 use Data::Dumper;
 use Item::Knife;
+use Item::Map;
 
 sub initialize {
     my $self = shift;

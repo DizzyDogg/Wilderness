@@ -4,13 +4,11 @@ use strict;
 use warnings;
 
 use World;
-use Data::Dumper;
 use Player;
+use Data::Dumper;
 
-my $world= World->new(name => 'Awesome');
-$world->initialize();
-
-my $player = Player->new();
+my $world = World->new();
+my $player = Player->new(location => $world->{'grid'}->{'0,0,0'});
 
 my %alternates = (
     have    => 'inventory',
