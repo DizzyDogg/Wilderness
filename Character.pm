@@ -16,14 +16,14 @@ sub can_go {
     my $direction = shift;
     my $here = $self->where();
     my $exits = $here->get_exits();
-    return $exits->{$direction} ? 1: 0;
+    return $exits->{$direction} ? 1 : 0;
 }
 
 sub move_to {
     my $self = shift;
     my $where = shift;
     my $here = $self->where();
-    $where->remove_item($self, $self);
+    $where->remove_item($self);
     $where->add_item($self);
     return $self->{'location'} = $where;
 }

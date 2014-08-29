@@ -5,11 +5,15 @@ use warnings;
 
 use base qw(Character);
 use Data::Dumper;
+use Item::Knife;
 
-sub name {
+sub initialize {
     my $self = shift;
-    my $name = ref($self);
-    return lc $name;
+    $self->SUPER::initialize();
+    my $knife = Item::Knife->new();
+    $self->equipment_add($knife);
+    my $map = Item::Map->new();
+    $self->equipment_add($knife);
 }
 
 sub quit {
@@ -140,7 +144,7 @@ sub take {
     return warn "\tThe $what is not somewhere you can reach\n" unless $self->can_reach($what);
     return warn "\tYou are not capable of taking the $what in its current state.\n"
               . $what->prior_action() unless ($self->visible_containers($what))[-1] == $here || ! $what->has_requirements();
-    return warn "\tYou already have the $what\n" unless $here->remove_item($self, $what);
+    return warn "\tYou already have the $what\n" unless $here->remove_item($what);
     return 0 unless $self->inventory_add($what);
     print "\tYou now have the $what\n";
 }
@@ -274,7 +278,7 @@ sub _kill {
         warn "\t\tA $item\n";
     }
     # and eliminate it
-    $here->remove_item($self, $baddie);
+    $here->remove_item($baddie);
     $world->delete($baddie);
 }
 

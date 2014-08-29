@@ -32,12 +32,14 @@ use overload
 sub new {
     my $package = shift;
     my $self = {@_};
+    my $name = lc((split '::', $package)[-1]);
     (my $path = $package) =~ s/::/\//;
     require "$path.pm";
     $self->{'hidden'} = Container->new();
     $self->{'visible'} = Container->new();
     bless $self, $package;
     $self->initialize();
+    $self->{'name'} ||= $name;
     return $self;
 }
 
@@ -209,13 +211,15 @@ sub inventory_add {
     my $self = shift;
     my $item = shift;
     my $added = $self->{'hidden'}->add($item);
+    $item->{'location'} = $self if $added;
     return $added;
 }
 
 sub inventory_remove {
     my $self = shift;
     my $item = shift;
-    $self->{'hidden'}->remove($item);
+    my $removed = $self->{'hidden'}->remove($item) if $self->{'hidden'};
+    return $removed;
 }
 
 sub get_inventory{
@@ -238,22 +242,15 @@ sub get_deep_inventory {
 sub equipment_add {
     my $self = shift;
     my $item = shift;
-    $self->{'visible'}->add($item);
+    my $added = $self->{'visible'}->add($item);
+    $item->{'location'} = $self if $added;
+    return $added;
 }
 
 sub equipment_remove {
     my $self = shift;
     my $item = shift;
     my $removed = $self->{'visible'}->remove($item);
-    if ( $removed ) {
-        delete $item->{'location'};
-    }
-    else {
-        my @objects = $self->get_equipment();
-        foreach my $object (@objects) {
-            last if $removed = $object->equipment_remove($item);
-        }
-    }
     return $removed;
 }
 

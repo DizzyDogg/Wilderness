@@ -7,6 +7,8 @@ use base qw(Object);
 
 sub is_place { 1 }
 
+# I need to figure out a way (in initialize?)
+# to add exits between rooms that exist and rooms I am creating
 sub initialize {
     my $self = shift;
     delete $self->{'hidden'};
@@ -23,19 +25,9 @@ sub add_item {
 
 sub remove_item {
     my $self = shift;
-    my $player = shift;
     my $item = shift;
     my $removed = $self->{'visible'}->remove($item);
-    if ( $removed ) {
-        delete $item->{'location'};
-    }
-    else {
-        my @objects = ($self->get_items(), $player->get_inventory());
-        foreach my $object (@objects) {
-            last if $removed = $object->equipment_remove($item);
-        }
-    }
-    return $removed;
+    return $remove;
 }
 
 sub has {
