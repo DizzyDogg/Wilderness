@@ -16,7 +16,7 @@ sub initialize {
         foreach $y (-2 .. 2) {
             my $even_coords = join ',', 2*$x, 2*$y, 2*$z;
             my $odd_coords = join ',', 2*$x-1, 2*$y-1, 2*$z;
-            $self->{'grid'}->{$even_coords} = Object::new('Biome::Forest', location => $even_coords);
+            $self->{'grid'}->{$even_coords} = Object::new('Biome::Forest', location => $even_coords, world => $self);
         }
     }
     return $self;

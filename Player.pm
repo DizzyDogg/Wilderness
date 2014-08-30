@@ -14,7 +14,7 @@ sub initialize {
     my $knife = Item::Knife->new();
     $self->equipment_add($knife);
     my $map = Item::Map->new();
-    $self->equipment_add($knife);
+    $self->inventory_add($map);
 }
 
 sub quit {
@@ -172,7 +172,10 @@ sub look {
             print "\tA $item notices your presence\n" if $item->is_character();
         }
         my $exits = $here->get_exits();
-        print ("\tThere are exits leading " . join(', ', keys %$exits) . "\n") if $exits;
+        print "\n";
+        foreach my $exit (sort keys $exits) {
+            print ("\tTo the $exit, you see a $exits->{$exit}[0]\n") if $exits->{$exit}[0];
+        }
     }
 }
 

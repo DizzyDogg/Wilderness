@@ -41,24 +41,30 @@ sub get_items {
     return $self->{'visible'}->get_all();
 }
 
-sub exit_add {
-    my $self = shift;
-    my $direction = shift;
-    my $leads_to = shift;
-    $self->{'exits'}{$direction} = $leads_to;
-    return $self;
-}
-
-sub exit_remove {
-    my $self = shift;
-    my $direction = shift;
-    delete $self->{'exits'}{$direction};
-    return $self;
-}
-
 sub get_exits {
     my $self = shift;
-    return $self->{'exits'};
+    my $coords = $self->where();
+    my ($x, $y, $z) = split ',', $coords;
+    my $north1 = $self->{'world'}->{'grid'}->{join ',', $x, $y+1, $z};
+    my $south1 = $self->{'world'}->{'grid'}->{join ',', $x, $y-1, $z};
+    my $east1 = $self->{'world'}->{'grid'}->{join ',', $x+1, $y, $z};
+    my $west1 = $self->{'world'}->{'grid'}->{join ',', $x-1, $y, $z};
+    my $north2 = $self->{'world'}->{'grid'}->{join ',', $x, $y+2, $z};
+    my $south2 = $self->{'world'}->{'grid'}->{join ',', $x, $y-2, $z};
+    my $east2 = $self->{'world'}->{'grid'}->{join ',', $x+2, $y, $z};
+    my $west2 = $self->{'world'}->{'grid'}->{join ',', $x-2, $y, $z};
+    my $north0 = "$north2" unless defined $north1;
+    my $south0 = "$south2" unless defined $south1;
+    my $east0 = "$east2" unless defined $east1;
+    my $west0 = "$west2" unless defined $west1;
+
+    my $exits = {
+        north => [$north0, $north1, $north2],
+        south => [$south0, $south1, $south2],
+        east  => [$east0, $east1, $east2],
+        west  => [$west0, $west1, $west2],
+    };
+    return $exits;
 }
 
 sub leads_to {
