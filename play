@@ -33,15 +33,14 @@ print "\n\nWelcome to the World of Awesome.\n";
 print "Do you have what it takes to survive?\n\n";
 
 # The introductory statement
-$player->look($world);
+$player->look();
 print "\n";
-$player->inventory($world);
-
+$player->inventory();
 
 while ( my ($verb, @arguments) = prompt() ) {
     if ( my $m = $player->can($alternates{$verb} || $verb) ) {
         my @args = $player->str2obj(@arguments);
-        $player->$m($world, @args);
+        $player->$m(@args);
     }
     else {
         warn "\tYou do not know how to $verb\n";

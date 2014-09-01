@@ -1,4 +1,4 @@
-package Item::;
+package Item::Template;
 
 use strict;
 use warnings;
@@ -25,8 +25,18 @@ sub get_tools { qw(tool1 tool2) }
 # sub sharpness { 10 }
 # sub weight { 5 }
 
+# # Populate the object with anything it contains
+# sub initialize {
+#     my $self = shift;
+#     $self->SUPER::initialize();
+#     my $sub_item = Item::SubItem->new();
+#     $self->equipment_add($sub_item);
+#     return $self;
+# }
+
 sub process {
     return "Description of how this item can be crafted.\n"
         .  "\tThis will display when a player 'crafts' this item\n";
+}
 
 1;

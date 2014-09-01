@@ -7,7 +7,7 @@ use base qw(Item);
 
 sub _desc { "You just stare at it mezmorized by the dancing flames" }
 
-sub get_ingredients { 'stick', 'branch' }
+sub get_ingredients { return qw(stick branch) }
 
 sub get_tools { 'bow' }
 

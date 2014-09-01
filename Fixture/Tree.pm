@@ -16,6 +16,7 @@ sub initialize {
     $self->SUPER::initialize();
     my $branch = Item::Branch->new();
     $self->equipment_add($branch);
+    return $self;
 }
 
 1;

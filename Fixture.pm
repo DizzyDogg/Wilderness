@@ -5,6 +5,6 @@ use warnings;
 
 use base qw(Object);
 
-sub is_fixture { 1 }
+sub is_fixture { return 1 }
 
 1;
