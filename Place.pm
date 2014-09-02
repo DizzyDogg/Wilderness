@@ -5,7 +5,7 @@ use warnings;
 
 use base qw(Object);
 
-sub is_place { 1 }
+sub is_place { return 1 }
 
 # I need to figure out a way (in initialize?)
 # to add exits between rooms that exist and rooms I am creating
@@ -53,10 +53,11 @@ sub get_exits {
     my $south2 = $self->{'world'}->{'grid'}->{join ',', $x, $y-2, $z};
     my $east2 = $self->{'world'}->{'grid'}->{join ',', $x+2, $y, $z};
     my $west2 = $self->{'world'}->{'grid'}->{join ',', $x-2, $y, $z};
-    my $north0 = "$north2" unless defined $north1;
-    my $south0 = "$south2" unless defined $south1;
-    my $east0 = "$east2" unless defined $east1;
-    my $west0 = "$west2" unless defined $west1;
+    my ($north0, $south0, $east0, $west0);
+    $north0 = "$north2" unless defined $north1;
+    $south0 = "$south2" unless defined $south1;
+    $east0 = "$east2" unless defined $east1;
+    $west0 = "$west2" unless defined $west1;
 
     my $exits = {
         north => [$north0, $north1, $north2],

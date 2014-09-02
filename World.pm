@@ -20,7 +20,7 @@ sub initialize {
             $self->{'grid'}->{$even_coords} = Object::new(
                 $self->pick_random_biome,
                 location => $even_coords,
-                world => $self
+                world => $self,
             );
         }
     }

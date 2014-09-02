@@ -15,13 +15,14 @@ sub initialize {
     $self->equipment_add($knife);
     my $map = Item::Map->new();
     $self->inventory_add($map);
+    return $self;
 }
 
 sub quit {
     warn "\tI hope you enjoyed your stay in the Wilderness of Awesome !!!\n";
     exit }
 
-sub is_player { 1 }
+sub is_player { return 1 }
 
 sub str2obj {
     my $self = shift;
@@ -34,7 +35,7 @@ sub str2obj {
 }
 
 sub give {
-    my ($self, $world, $item, $to, $receiver) = @_;
+    my ($self, $item, $to, $receiver) = @_;
     return warn "\tGive what to whom?\n" unless $item;
     return warn "\tYou have no $item to give\n" unless $self->has($item);
     return warn "\tYou must unequip the $item before you can give it away\n" unless $self->has_in($item);
@@ -46,11 +47,11 @@ sub give {
     $self->{'hidden'}->remove($item);
     $receiver->{'hidden'}->add($item);
     print "\tYou say 'goodbye' as you part with the $item, holding back the tears\n";
+    return $self;
 }
 
 sub go {
     my $self = shift;
-    my $world = shift;
     my $direction = shift;
     my $here = $self->where();
     return warn "\tGo where?\n"
@@ -58,13 +59,12 @@ sub go {
     return warn "\tCan't go $direction from here\n"
         unless my $new_room = $here->leads_to($direction);
     $self->move_to($new_room);
-    $self->look($world);
+    $self->look();
     return $self;
 }
 
 sub inventory {
     my $self = shift;
-    my $world = shift;
     my @args = @_;
     my @equipment = $self->get_equipment();
     my @inventory = $self->get_inventory();
@@ -80,11 +80,11 @@ sub inventory {
         # $item .= 's' if $how_many ne 'a';
         print "\tYou have a $item in your hand\n";
     }
+    return $self;
 }
 
 sub chop {
     my $self = shift;
-    my $world = shift;
     my $item = shift;
     my $here = $self->where();
     my @containers = $self->visible_containers($item);
@@ -92,7 +92,7 @@ sub chop {
     return warn "\tA $item is not something that can be chopped\n" unless $item->is_choppable();
     return warn "\tThe $item is not in a choppable state\n" if $item->is_item() && $here->has_on_ground($item);
     if ( $self->has_can_damage($item) ) {
-        $containers[1]->drop($world, $item);
+        $containers[1]->drop($item);
         return warn "\tYou successfully chopped down the $item\n";
     }
     return warn "\tYou were unable to chop down the $item\n";
@@ -100,7 +100,6 @@ sub chop {
 
 sub put {
     my $self = shift;
-    my $world = shift;
     my ($thing, $in_on, $receiver) = @_;
     return warn "\tPut what on or in what?\n" unless $thing;
     return warn "\tYou need to put $thing on or in something\n" unless $in_on;
@@ -124,7 +123,6 @@ sub put {
 
 sub take {
     my $self = shift;
-    my $world = shift;
     my $what = shift;
     my $here = $self->where();
     my @baddies = grep { $_->is_character() } $here->get_items();
@@ -148,16 +146,16 @@ sub take {
     return warn "\tYou already have the $what\n" unless $here->remove_item($what);
     return 0 unless $self->inventory_add($what);
     print "\tYou now have the $what\n";
+    return $self;
 }
 
 sub look {
     my $self = shift;
-    my $world = shift;
     my @args = @_;
     my $here = $self->where();
 
     if (@args) {
-        $self->examine($world, @args);
+        $self->examine(@args);
     }
     else {
         print "\tYou are in the $here\n";
@@ -174,14 +172,14 @@ sub look {
         my $exits = $here->get_exits();
         print "\n";
         foreach my $exit (sort keys $exits) {
-            print ("\tTo the $exit, you see a $exits->{$exit}[0]\n") if $exits->{$exit}[0];
+            print ("\t\tTo the $exit, you see a $exits->{$exit}[0]\n") if $exits->{$exit}[0];
         }
     }
+    return $self;
 }
 
 sub examine {
     my $self = shift;
-    my $world = shift;
     my $thing = shift;
     my $here = $self->where();
     if ( $thing =~ /up|down|north|south|east|west/ ) {
@@ -201,11 +199,11 @@ sub say {
     print "\tYou mutter for a bit ... and realize you are talking to youself\n"
           ."\tYou decide that you can indeed still talk\n"
           ."\tBut, you shake your head and refocus your efforts on surviving\n";
+    return $self;
 }
 
 sub recipe {
     my $self = shift;
-    my $world = shift;
     my $product = shift;
     return warn "\tWhich recipe would you like to see?\n" unless $product;
     return warn "\tI don't know what a $product is\n" unless ref $product;
@@ -225,7 +223,6 @@ sub recipe {
 
 sub make {
     my $self = shift;
-    my $world = shift;
     my $product = shift;
     my $here = $self->where();
     my @ingredients = $product->get_ingredients();
@@ -245,7 +242,7 @@ sub make {
     }
     $product->is_item() ? $self->inventory_add($product) : $here->add_item($product);
     foreach my $ingredient ( @ingredients ) {
-        $self->give($world, $ingredient, 'to', $product);
+        $self->give($ingredient, 'to', $product);
     }
     my $process = $product->process();
     return warn "\t$process\n";
@@ -258,7 +255,6 @@ sub slay { shift->_kill(slay => @_) }
 sub _kill {
     my $self = shift;
     my $word = shift;
-    my $world = shift;
     my ($baddie, $with, $item) = (@_);
     my $here = $self->where();
     return warn "\t\u${word} who with what?\n" unless ref $baddie;
@@ -283,7 +279,8 @@ sub _kill {
     }
     # and eliminate it
     $here->remove_item($baddie);
-    $world->delete($baddie);
+    # delete $baddie; Do I just leave it around with no location?
+    return $self;
 }
 
 sub die { warn "\tUmmm ... No! That is the OPPOSITE of the point of this game\n" }

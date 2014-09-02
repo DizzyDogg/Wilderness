@@ -40,7 +40,7 @@ sub contains {
     my $self = shift;
     my $item = shift;
     foreach my $object ( @$self ) {
-        return 1 if $object eq $item;
+        return $object if $object eq $item;
     }
     return 0;
 }
