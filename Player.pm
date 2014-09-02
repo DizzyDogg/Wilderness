@@ -54,8 +54,7 @@ sub go {
     my $self = shift;
     my $direction = shift;
     my $here = $self->where();
-    return warn "\tGo where?\n"
-        unless defined $direction;
+    return warn "\tGo where?\n" unless defined $direction;
     return warn "\tCan't go $direction from here\n"
         unless my $new_room = $here->leads_to($direction);
     $self->move_to($new_room);
@@ -126,27 +125,35 @@ sub take {
     my $what = shift;
     my $here = $self->where();
     my @baddies = grep { $_->is_character() } $here->get_items();
-    return warn "\tI don't know what a $what is\n" unless ref $what;
+    return warn "\tThere's no $what here\n" unless ref $what;
+    return warn "\tUmm ... What did you actually expect that to do?\n" if $what->is_player();
     foreach my $baddie (@baddies) {
         return warn "\tUmmm ... That is currently in someone's possession\n" if $baddie->has_on($what);
     }
-    return warn "\tThere's no $what here\n" unless $self->can_see($what);
     if ( $what->is_character() ) {
         print "\tSeriously? ... you really want that $what?\n";
         print "\tYou lonely? You want it as a pet or something?\n";
         print "\tProbably not the best idea\n";
         return;
     }
-    if ( $what->is_fixture() ) {
-        return warn "\tThe $what is relatively permanent ... sorry\n";
-    }
+    return warn "\tThe $what is relatively permanent ... sorry\n" if $what->is_fixture();
     return warn "\tThe $what is not somewhere you can reach\n" unless $self->can_reach($what);
-    return warn "\tYou are not capable of taking the $what in its current state.\n"
-              . $what->prior_action() unless ($self->visible_containers($what))[-1] == $here || ! $what->has_requirements();
-    return warn "\tYou already have the $what\n" unless $here->remove_item($what);
-    return 0 unless $self->inventory_add($what);
-    print "\tYou now have the $what\n";
-    return $self;
+    my $cont = ($here->visible_containers($what))[1];
+    if ( $cont && $cont != $here && $what->has_requirements() ) {
+        return warn "\tYou are not capable of taking the $what in its current state.\n"
+                  . $what->prior_action();
+    }
+    # return warn "\tYou already have the $what\n" unless
+    if ( $cont ) {
+        my $removed = $cont->equipment_remove($what) || $cont->remove_item($what);
+        return warn "\t$what could not be removed\n" unless $removed;
+        my $added = $self->inventory_add($what);
+        return warn "\t$what could not be added to your inventory\n" unless $added;
+        return warn "\tYou now have the $what\n";
+    }
+    my $mine = $self->has_on($what) || $self->has_in($what);
+    return warn "\tAll the $what you can see is already in your possession\n" if $mine;
+    return warn "\tTaking $what did not work\n";
 }
 
 sub look {
