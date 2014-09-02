@@ -15,6 +15,20 @@ use overload
         my $self = shift;
         return $self->name();
     },
+    'eq' => sub {
+        my $a = shift;
+        my $b = shift;
+        $a = $a->name() if (ref $a && $a->can('name'));
+        $b = $b->name() if (ref $b && $b->can('name'));
+        return $a eq $b;
+    },
+    'ne' => sub {
+        my $a = shift;
+        my $b = shift;
+        $a = $a->name() if (ref $a && $a->can('name'));
+        $b = $b->name() if (ref $b && $b->can('name'));
+        return $a ne $b;
+    },
     '==' => sub {
         my $a = shift;
         my $b = shift;
@@ -22,13 +36,17 @@ use overload
         $b = $b->name() if (ref $b && $b->can('name'));
         return $a eq $b;
     },
-    'eq' => sub {
+    '!=' => sub {
         my $a = shift;
         my $b = shift;
         $a = $a->name() if (ref $a && $a->can('name'));
         $b = $b->name() if (ref $b && $b->can('name'));
-        return $a eq $b;
-    };
+        return $a ne $b;
+    },
+    # '==' => sub { return shift eq shift },
+    # '!=' => sub { return ! shift eq shift },
+    # 'ne' => sub { return ! shift eq shift },
+    ;
 
 sub new {
     my $package = shift;
