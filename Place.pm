@@ -71,7 +71,7 @@ sub get_exits {
 sub leads_to {
     my $self = shift;
     my $direction = shift;
-    return $self->{'exits'}{$direction};
+    return $self->get_exits->{$direction}->[2];
 }
 
 1;
