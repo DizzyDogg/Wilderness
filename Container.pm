@@ -28,7 +28,7 @@ sub remove {
     foreach my $i ( 0 .. scalar(@$self)-1 ) {
         return my ($a) = splice(@$self, $i, 1) if $self->[$i] == $item;
     }
-    return 0;
+    return;
 }
 
 sub get_all {
