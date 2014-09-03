@@ -5,9 +5,9 @@ use warnings;
 
 use base qw(Item);
 
-sub get_ingredients { 'hide' }
+sub get_ingredients { return 'hide' }
 
-sub get_tools { 'handaxe' }
+sub get_tools { return 'handaxe' }
 
 sub process {
     return "You take the handaxe and carefully cut the hide into strips\n"

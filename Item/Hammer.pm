@@ -11,9 +11,9 @@ sub _desc {
     . "\tIt can be used for building and for destroying. Use with care.";
 }
 
-sub get_ingredients { qw(rock stick cord) }
+sub get_ingredients { return qw(rock stick cord) }
 
-sub get_tools {  }
+sub get_tools { return }
 
 sub process {
     return "You place the rock on one end of the stick and they magically stick together.";

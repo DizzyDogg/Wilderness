@@ -5,7 +5,7 @@ use warnings;
 
 use base qw(Item);
 
-sub get_ingredients { 'rock' }
+sub get_ingredients { return 'rock' }
 
 sub process {
     return "You smash the rock against something hard a few times until finally\n"

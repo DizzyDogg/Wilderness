@@ -9,7 +9,7 @@ sub _desc { "You just stare at it mezmorized by the dancing flames" }
 
 sub get_ingredients { return qw(stick branch) }
 
-sub get_tools { 'bow' }
+sub get_tools { return 'bow' }
 
 sub process {
     return "You wrap the stick within the cord of the bow and set the\n"

@@ -12,10 +12,10 @@ sub _desc {
 }
 
 # components added into the creation of this item
-sub get_ingredients { qw(item1 item2 item3) }
+sub get_ingredients { return qw(item1 item2 item3) }
 
 # tools requipred (not consumed) in the crafting of this item
-sub get_tools { qw(tool1 tool2) }
+sub get_tools { return qw(tool1 tool2) }
 
 # requirements to free up this item so it can be obtained
 # sub required_sharpness { 10 }
