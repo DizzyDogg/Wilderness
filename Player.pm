@@ -57,6 +57,7 @@ sub go {
     return warn "\tGo where?\n" unless defined $direction;
     return warn "\tCan't go $direction from here\n"
         unless my $new_room = $here->leads_to($direction);
+    return warn "\tYou can't go through the $new_room\n" if $new_room->is_obstruction();
     $self->move_to($new_room);
     $self->look();
     return $self;

@@ -54,10 +54,10 @@ sub get_exits {
     my $east2 = $self->{'world'}->{'grid'}->{join ',', $x+2, $y, $z};
     my $west2 = $self->{'world'}->{'grid'}->{join ',', $x-2, $y, $z};
     my ($north0, $south0, $east0, $west0);
-    $north0 = "$north2" unless defined $north1;
-    $south0 = "$south2" unless defined $south1;
-    $east0 = "$east2" unless defined $east1;
-    $west0 = "$west2" unless defined $west1;
+    $north0 = $north1 && $north1->is_obstruction() ? $north1 : $north2;
+    $south0 = $south1 && $south1->is_obstruction() ? $south1 : $south2;
+    $east0 = $east1 && $east1->is_obstruction() ? $east1 : $east2;
+    $west0 = $west1 && $west1->is_obstruction() ? $west1 : $west2;
 
     my $exits = {
         north => [$north0, $north1, $north2],
@@ -71,7 +71,7 @@ sub get_exits {
 sub leads_to {
     my $self = shift;
     my $direction = shift;
-    return $self->get_exits->{$direction}->[2];
+    return $self->get_exits->{$direction}->[0];
 }
 
 1;

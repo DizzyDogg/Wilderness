@@ -13,6 +13,7 @@ sub initialize {
         my $rock = Item::Rock->new();
         $self->add_item($rock);
     }
+    return $self;
 }
 
 1;

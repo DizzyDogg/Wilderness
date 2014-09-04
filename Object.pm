@@ -71,6 +71,7 @@ sub is_fixture { return }
 sub is_player { return }
 sub is_place { return }
 sub is_biome { return }
+sub is_obstruction { return }
 
 #find a way to check the 'required_action' instead of 'is_choppable'
 sub is_choppable { return }

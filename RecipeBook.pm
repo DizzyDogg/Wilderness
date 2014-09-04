@@ -34,8 +34,6 @@ foreach my $dir (@dirs) {
     }
 }
 
-print Dumper $recipe;
-
 sub has_recipe {
     my $self = shift;
     my $product = shift;
