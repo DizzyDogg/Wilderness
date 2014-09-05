@@ -22,8 +22,8 @@ foreach my $dir (@dirs) {
     opendir(DIR, $dir) or die $!;
     while ( my $file = readdir(DIR) ) {
         next if ($file =~ m/^\./);
-        my $path = "$dir\/$file";
-        my $package = "$dir::$file";
+        my $path = "$dir/$file";
+        my $package = "$dir\::$file";
         $package =~ s/\.pm//;
         (my $product = $file) =~ s/\.pm//;
         $product = lc($product);
