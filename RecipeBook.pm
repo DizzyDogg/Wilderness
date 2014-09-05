@@ -28,8 +28,9 @@ foreach my $dir (@dirs) {
         (my $product = $file) =~ s/\.pm//;
         $product = lc($product);
         require $path;
-        $recipe->{$product}->{'ingredients'} = [ $package->_get_ingredients() ] || [];
-        $recipe->{$product}->{'tools'} = [ $package->_get_tools() ] || [];
+        $recipe->{$product}->{'package'} = $package || '';
+        $recipe->{$product}->{'ingredients'} = [ $package->_get_ingredients() ];
+        $recipe->{$product}->{'tools'} = [ $package->_get_tools() ];
         $recipe->{$product}->{'process'} = $package->_process() || '';
     }
 }
@@ -38,6 +39,12 @@ sub _has_recipe {
     my $self = shift;
     my $product = shift;
     return $recipe->{"$product"} ? $recipe->{"$product"} : undef;
+}
+
+sub _get_package {
+    my $self = shift;
+    my $product = shift;
+    return $recipe->{$product}->{'package'};
 }
 
 sub _get_ingredients {

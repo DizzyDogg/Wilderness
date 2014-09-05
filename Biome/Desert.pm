@@ -9,7 +9,7 @@ use Item::Rock;
 sub _initialize {
     my $self = shift;
     $self->SUPER::_initialize();
-    if ( rand() < .4 ) {
+    if ( rand() < .8 ) {
         my $rock = Item::Rock->_new();
         $self->_add_item($rock);
     }

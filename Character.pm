@@ -89,9 +89,10 @@ sub make {
     if ( @lack ) {
         return warn "\tTo make a $product, you still need\n" . "\t\tA $lack_string\n";
     }
-    $product->_is_item() ? $self->_inventory_add($product) : $here->_add_item($product);
+    my $made = $recipe_book->_get_package($product)->_new();
+    $made->_is_item() ? $self->_inventory_add($made) : $here->_add_item($made);
     foreach my $ingredient ( @ingredients ) {
-        $self->give($ingredient, 'to', $product);
+        $self->give($ingredient, 'to', $made);
     }
     my $process = $recipe_book->_get_process($product);
     return warn "\t$process\n";

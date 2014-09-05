@@ -44,7 +44,7 @@ sub _pick_random_biome {
     my $random = rand();
     my $biome = 'Biome::';
     $biome .= $random < .2 ? 'Field' :
-             $random < .4 ? 'Desert' :
+             $random < .5 ? 'Desert' :
              'Forest';
     return $biome;
 }
