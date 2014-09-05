@@ -5,8 +5,8 @@ use warnings;
 
 use base qw(Mob);
 
-sub is_hostile { return 1 }
+sub _is_hostile { return 1 }
 
-sub hit_points { return 4 }
+sub _hit_points { return 4 }
 
 1;

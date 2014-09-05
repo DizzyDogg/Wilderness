@@ -10,12 +10,12 @@ sub _desc {
         .  "\tmaking it more capable of chopping larger things";
 }
 
-sub get_ingredients { return qw{handaxe stick cord} }
+sub _get_ingredients { return qw{handaxe stick cord} }
 
-sub weight { return 5 }
-sub sharpness { return 10 }
+sub _weight { return 5 }
+sub _sharpness { return 10 }
 
-sub process {
+sub _process {
     return "You place the handaxe on one end of the stick\n"
         .  "\tand fasten them together with the cord";
 }

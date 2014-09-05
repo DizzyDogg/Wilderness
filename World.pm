@@ -7,7 +7,7 @@ use base qw(Object);
 
 use Data::Dumper;
 
-sub initialize {
+sub _initialize {
     my $self = shift;
     $self->{'grid'}->{'0,0,0'} = 'new_world';
     my $z = 0;
@@ -26,10 +26,10 @@ sub initialize {
                 $biome = 'Biome::Beach';
             }
             else {
-                $biome = $location == 0 ? $self->pick_random_biome() : next;
+                $biome = $location == 0 ? $self->_pick_random_biome() : next;
             }
             my $coords = join ',', $x, $y, $z;
-            $self->{'grid'}->{$coords} = Object::new(
+            $self->{'grid'}->{$coords} = Object::_new(
                 $biome,
                 location => $coords,
                 world => $self,
@@ -39,7 +39,7 @@ sub initialize {
     return $self;
 }
 
-sub pick_random_biome {
+sub _pick_random_biome {
     my $self = shift;
     my $random = rand();
     my $biome = 'Biome::';
@@ -47,24 +47,6 @@ sub pick_random_biome {
              $random < .4 ? 'Desert' :
              'Forest';
     return $biome;
-}
-
-sub is_odd {
-    my $self = shift;
-    my ($x, $y, $z) = @_;
-
-}
-
-sub is_even {
-    my $self = shift;
-    my ($x, $y, $z) = @_;
-    $x%2 
-}
-
-sub is_corner {
-    my $self = shift;
-    my ($x, $y, $z) = @_;
-
 }
 
 1;

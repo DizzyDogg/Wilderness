@@ -9,20 +9,20 @@ use Data::Dumper;
 
 # Containers are now officially ARRAY refs, not HASH refs.
 
-sub new {
+sub _new {
     my $package = shift;
     my $self = [@_];
     bless $self, $package;
     return $self;
 }
 
-sub add {
+sub _add {
     my $self = shift;
     my $item = shift;
     return push @$self, $item;
 }
 
-sub remove {
+sub _remove {
     my $self = shift;
     my $item = shift;
     foreach my $i ( 0 .. scalar(@$self)-1 ) {
@@ -31,12 +31,12 @@ sub remove {
     return;
 }
 
-sub get_all {
+sub _get_all {
     my $self = shift;
     return @$self;
 }
 
-sub contains {
+sub _contains {
     my $self = shift;
     my $item = shift;
     foreach my $object ( @$self ) {

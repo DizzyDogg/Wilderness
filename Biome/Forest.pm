@@ -7,17 +7,16 @@ use base qw(Biome);
 use Fixture::Tree;
 use Mob::Deer;
 
-sub initialize {
+sub _initialize {
     my $self = shift;
-    $self->SUPER::initialize();
+    $self->SUPER::_initialize();
     my $random = rand();
-    my $tree = Fixture::Tree->new();
-        $self->add_item($tree);
-    # }
-    # if within 90% {
-        my $deer = Mob::Deer->new();
-        $self->add_item($deer);
-    # }
+    my $tree = Fixture::Tree->_new();
+        $self->_add_item($tree);
+    if ( $random < .6 ) {
+        my $deer = Mob::Deer->_new();
+        $self->_add_item($deer);
+    }
 }
 
 1;

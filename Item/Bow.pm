@@ -10,9 +10,9 @@ sub _desc {
     . "Although, I am not sure how accurate it will be";
 }
 
-sub get_ingredients { return qw(stick cord) }
+sub _get_ingredients { return qw(stick cord) }
 
-sub process {
+sub _process {
     return "You fasten each end of the cord to each end of the stick.\n";
 }
 

@@ -5,9 +5,9 @@ use warnings;
 
 use base qw(Mob);
 
-sub is_hostile { 1 }
+sub _is_hostile { 1 }
 
-sub hit_points { 10 }
+sub _hit_points { 10 }
 
 sub _desc { 'It is huge and intimidating' }
 

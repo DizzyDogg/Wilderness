@@ -8,13 +8,13 @@ use Data::Dumper;
 use Item::Knife;
 use Item::Map;
 
-sub initialize {
+sub _initialize {
     my $self = shift;
-    $self->SUPER::initialize();
-    my $knife = Item::Knife->new();
-    $self->equipment_add($knife);
-    my $map = Item::Map->new();
-    $self->inventory_add($map);
+    $self->SUPER::_initialize();
+    my $knife = Item::Knife->_new();
+    $self->_equipment_add($knife);
+    my $map = Item::Map->_new();
+    $self->_inventory_add($map);
     return $self;
 }
 
@@ -22,14 +22,14 @@ sub quit {
     warn "\tI hope you enjoyed your stay in the Wilderness of Awesome !!!\n";
     exit }
 
-sub is_player { return 1 }
+sub _is_player { return 1 }
 
-sub str2obj {
+sub _str2obj {
     my $self = shift;
     my @args = @_;
     my @objs;
     foreach my $str (@args) {
-        push @objs, $self->can_see($str) || $str;
+        push @objs, $self->_can_see($str) || $str;
     }
     return @objs;
 }
@@ -37,15 +37,15 @@ sub str2obj {
 sub give {
     my ($self, $item, $to, $receiver) = @_;
     return warn "\tGive what to whom?\n" unless $item;
-    return warn "\tYou have no $item to give\n" unless $self->has($item);
-    return warn "\tYou must unequip the $item before you can give it away\n" unless $self->has_in($item);
+    return warn "\tYou have no $item to give\n" unless $self->_has($item);
+    return warn "\tYou must unequip the $item before you can give it away\n" unless $self->_has_in($item);
     return warn "\tGive $item to whom?\n" unless ref $receiver;
     # see if this warn spews on characters that do not exist anywhere
     return warn "\tSorry ... there is no $receiver here\n"
-        unless ( $self->has($receiver) or ( $receiver->where() eq $self->where() ) );
+        unless ( $self->_has($receiver) or ( $receiver->_where() eq $self->_where() ) );
 
-    $self->{'hidden'}->remove($item);
-    $receiver->{'hidden'}->add($item);
+    $self->{'hidden'}->_remove($item);
+    $receiver->{'hidden'}->_add($item);
     print "\tYou say 'goodbye' as you part with the $item, holding back the tears\n";
     return $self;
 }
@@ -53,12 +53,12 @@ sub give {
 sub go {
     my $self = shift;
     my $direction = shift;
-    my $here = $self->where();
+    my $here = $self->_where();
     return warn "\tGo where?\n" unless defined $direction;
     return warn "\tCan't go $direction from here\n"
-        unless my $new_room = $here->leads_to($direction);
-    return warn "\tYou can't go through the $new_room\n" if $new_room->is_obstruction();
-    $self->move_to($new_room);
+        unless my $new_room = $here->_leads_to($direction);
+    return warn "\tYou can't go through the $new_room\n" if $new_room->_is_obstruction();
+    $self->_move_to($new_room);
     $self->look();
     return $self;
 }
@@ -66,8 +66,8 @@ sub go {
 sub inventory {
     my $self = shift;
     my @args = @_;
-    my @equipment = $self->get_equipment();
-    my @inventory = $self->get_inventory();
+    my @equipment = $self->_get_equipment();
+    my @inventory = $self->_get_inventory();
     my @possessions = ( @equipment, @inventory );
     print "\tYou have ... nothing\n" unless @possessions;
     foreach my $item ( @inventory ) {
@@ -86,12 +86,12 @@ sub inventory {
 sub chop {
     my $self = shift;
     my $item = shift;
-    my $here = $self->where();
-    my @containers = $self->visible_containers($item);
-    return warn "\tYou cannot see any $item\n" unless $self->can_see($item);
-    return warn "\tA $item is not something that can be chopped\n" unless $item->is_choppable();
-    return warn "\tThe $item is not in a choppable state\n" if $item->is_item() && $here->has_on_ground($item);
-    if ( $self->has_can_damage($item) ) {
+    my $here = $self->_where();
+    my @containers = $self->_visible_containers($item);
+    return warn "\tYou cannot see any $item\n" unless $self->_can_see($item);
+    return warn "\tA $item is not something that can be chopped\n" unless $item->_is_choppable();
+    return warn "\tThe $item is not in a choppable state\n" if $item->_is_item() && $here->_has_on_ground($item);
+    if ( $self->_has_can_damage($item) ) {
         $containers[1]->drop($item);
         return warn "\tYou successfully chopped down the $item\n";
     }
@@ -110,12 +110,12 @@ sub put {
             .   "\tWhat does that even mean? What would that even look like?\n"
             .   "\tYou know what? No ... Just NO!\n" if $thing eq $receiver;
     return warn "\tI do not know what a $receiver is\n" unless ref $receiver;
-    return warn "\tYou do not have a $thing to put $in_on that $receiver\n" unless $self->has($thing);
-    return warn "\tYou cannot see a $receiver here\n" unless $self->can_see($receiver);
-    my $lost = $self->equipment_remove($thing) || $self->inventory_remove($thing);
+    return warn "\tYou do not have a $thing to put $in_on that $receiver\n" unless $self->_has($thing);
+    return warn "\tYou cannot see a $receiver here\n" unless $self->_can_see($receiver);
+    my $lost = $self->_equipment_remove($thing) || $self->_inventory_remove($thing);
     if ( $lost ) {
-        $receiver->inventory_add($thing) if $in_on eq 'in';
-        $receiver->equipment_add($thing) if $in_on eq 'on';
+        $receiver->_inventory_add($thing) if $in_on eq 'in';
+        $receiver->_equipment_add($thing) if $in_on eq 'on';
     }
     print "\tYou carefully put the $thing $in_on the $receiver\n";
     return;
@@ -124,35 +124,35 @@ sub put {
 sub take {
     my $self = shift;
     my $what = shift;
-    my $here = $self->where();
-    my @baddies = grep { $_->is_character() } $here->get_items();
+    my $here = $self->_where();
+    my @baddies = grep { $_->_is_character() } $here->_get_items();
     return warn "\tThere's no $what here\n" unless ref $what;
-    return warn "\tUmm ... What did you actually expect that to do?\n" if $what->is_player();
+    return warn "\tUmm ... What did you actually expect that to do?\n" if $what->_is_player();
     foreach my $baddie (@baddies) {
-        return warn "\tUmmm ... That is currently in someone's possession\n" if $baddie->has_on($what);
+        return warn "\tUmmm ... That is currently in someone's possession\n" if $baddie->_has_on($what);
     }
-    if ( $what->is_character() ) {
+    if ( $what->_is_character() ) {
         print "\tSeriously? ... you really want that $what?\n";
         print "\tYou lonely? You want it as a pet or something?\n";
         print "\tProbably not the best idea\n";
         return;
     }
-    return warn "\tThe $what is relatively permanent ... sorry\n" if $what->is_fixture();
-    return warn "\tThe $what is not somewhere you can reach\n" unless $self->can_reach($what);
-    my $cont = ($here->visible_containers($what))[1];
-    if ( $cont && $cont != $here && $what->has_requirements() ) {
+    return warn "\tThe $what is relatively permanent ... sorry\n" if $what->_is_fixture();
+    return warn "\tThe $what is not somewhere you can reach\n" unless $self->_can_reach($what);
+    my $cont = ($here->_visible_containers($what))[1];
+    if ( $cont && $cont != $here && $what->_has_requirements() ) {
         return warn "\tYou are not capable of taking the $what in its current state.\n"
-                  . $what->prior_action();
+                  . $what->_prior_action();
     }
     # return warn "\tYou already have the $what\n" unless
     if ( $cont ) {
-        my $removed = $cont->equipment_remove($what) || $cont->remove_item($what);
+        my $removed = $cont->_equipment_remove($what) || $cont->_remove_item($what);
         return warn "\t$what could not be removed\n" unless $removed;
-        my $added = $self->inventory_add($what);
+        my $added = $self->_inventory_add($what);
         return warn "\t$what could not be added to your inventory\n" unless $added;
         return warn "\tYou now have the $what\n";
     }
-    my $mine = $self->has_on($what) || $self->has_in($what);
+    my $mine = $self->_has_on($what) || $self->_has_in($what);
     return warn "\tAll the $what you can see is already in your possession\n" if $mine;
     return warn "\tTaking $what did not work\n";
 }
@@ -160,7 +160,7 @@ sub take {
 sub look {
     my $self = shift;
     my @args = @_;
-    my $here = $self->where();
+    my $here = $self->_where();
 
     if (@args) {
         $self->examine(@args);
@@ -168,16 +168,14 @@ sub look {
     else {
         print "\tYou are in the $here\n";
 
-        my @items = $here->get_items();
+        my @items = $here->_get_items();
         foreach my $item ( @items ) {
             next if $item eq $self;
-            # my $how_many = $items->{$item} == 1 ? 'a' : $items->{$item};
-            # $item .= 's' if $how_many ne 'a';
-            print "\tYou see a $item lying on the ground\n" if $item->is_item();
-            print "\tThere is a $item here\n" if $item->is_fixture();
-            print "\tA $item notices your presence\n" if $item->is_character();
+            print "\tYou see a $item lying on the ground\n" if $item->_is_item();
+            print "\tThere is a $item here\n" if $item->_is_fixture();
+            print "\tA $item notices your presence\n" if $item->_is_character();
         }
-        my $exits = $here->get_exits();
+        my $exits = $here->_get_exits();
         print "\n";
         foreach my $exit (sort keys $exits) {
             print ("\t\tTo the $exit, you see a $exits->{$exit}[0]\n") if $exits->{$exit}[0];
@@ -189,16 +187,16 @@ sub look {
 sub examine {
     my $self = shift;
     my $thing = shift;
-    my $here = $self->where();
+    my $here = $self->_where();
     if ( $thing =~ /up|down|north|south|east|west/ ) {
-        my $room = $here->leads_to($thing);
+        my $room = $here->_leads_to($thing);
         return warn "\tYou see nothing of interest $thing\n" unless $room;
         print "\tWhen you look $thing, you see the $room\n" if $room;
         return;
     }
     return warn "\tI have no idea what a $thing is\n" unless ref $thing;
-    return warn "\tYou cannot see a $thing\n" unless $self->can_see($thing);
-    my $description = $thing->describe();
+    return warn "\tYou cannot see a $thing\n" unless $self->_can_see($thing);
+    my $description = $thing->_describe();
     return warn "\t$description\n";
 }
 
@@ -218,29 +216,29 @@ sub _kill {
     my $self = shift;
     my $word = shift;
     my ($baddie, $with, $item) = (@_);
-    my $here = $self->where();
+    my $here = $self->_where();
     return warn "\t\u${word} who with what?\n" unless ref $baddie;
     return warn "\t\uWhat will you kill the $baddie with?\n" unless ref $item;
-    return warn "\tYou don't have a $item\n" unless $self->has($item);
-    return warn "\tYou must equip your $item before you may use it\n" unless $self->has_on($item);
-    return warn "\tThe $baddie is not something that can be killed\n" unless $baddie->get_health();
-    return warn "\tThere is no $baddie here\n" unless $baddie->where() eq $here;
+    return warn "\tYou don't have a $item\n" unless $self->_has($item);
+    return warn "\tYou must equip your $item before you may use it\n" unless $self->_has_on($item);
+    return warn "\tThe $baddie is not something that can be killed\n" unless $baddie->_get_health();
+    return warn "\tThere is no $baddie here\n" unless $baddie->_where() eq $here;
     return warn "\tWhy would you kill the poor innocent $baddie?\n"
-                . "\tIt hasn't done anything to anyone\n" unless $baddie->is_character();
+                . "\tIt hasn't done anything to anyone\n" unless $baddie->_is_character();
     return warn "\tUh ... I am pretty sure suicide is illegal\n"
                 . "\tand generally considered bad for your health\n" if $baddie == $self;
 
     # now we add its inventory to the room's inventory
     print "\u\tYou ${word}ed the $baddie\n";
     print "\tYou watch as the $baddie blinks out of existence\n";
-    my @loot = $baddie->get_all();
+    my @loot = $baddie->_get_all();
     print "\t\tYou notice it has left:\n" if @loot;
     foreach my $item ( @loot ) {
-        $here->add_item($item);
+        $here->_add_item($item);
         warn "\t\tA $item\n";
     }
     # and eliminate it
-    $here->remove_item($baddie);
+    $here->_remove_item($baddie);
     # delete $baddie; Do I just leave it around with no location?
     return $self;
 }

@@ -11,11 +11,11 @@ sub _desc {
     ."\tIt seems like you could climb this tree, or use its wood to make things.";
 }
 
-sub initialize {
+sub _initialize {
     my $self = shift;
-    $self->SUPER::initialize();
-    my $branch = Item::Branch->new();
-    $self->equipment_add($branch);
+    $self->SUPER::_initialize();
+    my $branch = Item::Branch->_new();
+    $self->_equipment_add($branch);
     return $self;
 }
 
