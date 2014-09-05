@@ -72,11 +72,11 @@ sub recipe {
 sub make {
     my $self = shift;
     my $product = shift;
+    return warn "\tI am sorry, you want to make what?\n" unless $product;
+    return warn "\tI don't know what a $product is\n" unless defined $recipe_book->_has_recipe($product);
     my $here = $self->_where();
     my @ingredients = $recipe_book->_get_ingredients("$product");
     my @tools = $recipe_book->_get_tools("$product");
-    return warn "\tI am sorry, you want to make what?\n" unless $product;
-    return warn "\tI don't know what a $product is\n" unless $recipe_book->_has_recipe($product);
     return warn "\tA $product is not something you know how to make\n" unless @ingredients;
     my @lack;
     foreach my $ingredient (@ingredients) {

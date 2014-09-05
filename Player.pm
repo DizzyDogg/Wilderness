@@ -187,6 +187,7 @@ sub look {
 sub examine {
     my $self = shift;
     my $thing = shift;
+    return warn "\tWhat would you like to examine?\n" unless $thing;
     my $here = $self->_where();
     if ( $thing =~ /up|down|north|south|east|west/ ) {
         my $room = $here->_leads_to($thing);

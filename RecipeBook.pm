@@ -37,7 +37,7 @@ foreach my $dir (@dirs) {
 sub _has_recipe {
     my $self = shift;
     my $product = shift;
-    return $recipe->{"$product"};
+    return $recipe->{"$product"} ? $recipe->{"$product"} : undef;
 }
 
 sub _get_ingredients {
