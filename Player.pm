@@ -177,7 +177,7 @@ sub look {
         }
         my $exits = $here->_get_exits();
         print "\n";
-        foreach my $exit (sort keys $exits) {
+        foreach my $exit (sort keys %$exits) {
             print ("\t\tTo the $exit, you see a $exits->{$exit}[0]\n") if $exits->{$exit}[0];
         }
     }
