@@ -5,6 +5,6 @@ use warnings;
 
 use base qw(Place);
 
-sub _is_biome { return 1 }
+sub is_biome { return 1 }
 
 1;

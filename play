@@ -7,9 +7,9 @@ use World;
 use Player;
 use Data::Dumper;
 
-my $world = World->_new();
-my $player = Player->_new(location => $world->{'grid'}->{'0,0,0'});
-$world->{'grid'}->{'0,0,0'}->_add_item($player);
+my $world = World->new();
+my $player = Player->new(location => $world->{'grid'}->{'0,0,0'});
+$world->{'grid'}->{'0,0,0'}->add_item($player);
 
 my %alternates = (
     have    => 'inventory',
@@ -38,7 +38,7 @@ $player->look();
 print "\n";
 $player->inventory();
 
-while ( my ($verb, @arguments) = _prompt() ) {
+while ( my ($verb, @arguments) = prompt() ) {
     if ( $verb =~ /^\_/ ) {
         warn "\tFor your own safety, I would recommend against using '_'\n"
             . "\tThe last time a player used that, they were stepped on by Big Foot\n"
@@ -49,7 +49,7 @@ while ( my ($verb, @arguments) = _prompt() ) {
         next;
     }
     if ( my $m = $player->can($alternates{$verb} || $verb) ) {
-        my @args = $player->_str2obj(@arguments);
+        my @args = $player->str2obj(@arguments);
         $player->$m(@args);
     }
     else {
@@ -58,7 +58,7 @@ while ( my ($verb, @arguments) = _prompt() ) {
 }
 
 # Modify prompt to not return until it gets an input
-sub _prompt {
+sub prompt {
     print "\nWhat would you like to do? ";
     my $command = <STDIN>;
     chomp $command;

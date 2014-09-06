@@ -5,6 +5,6 @@ use warnings;
 
 use base qw(Item);
 
-sub _damage { return 10 }
+sub damage { return 10 }
 
 1;

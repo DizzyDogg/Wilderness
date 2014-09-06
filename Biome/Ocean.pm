@@ -6,9 +6,9 @@ use warnings;
 use base qw(Biome);
 use Item::Fish;
 
-sub _initialize {
+sub initialize {
     my $self = shift;
-    $self->SUPER::_initialize();
+    $self->SUPER::initialize();
     my $random = rand();
 }
 

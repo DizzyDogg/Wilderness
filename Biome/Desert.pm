@@ -6,12 +6,12 @@ use warnings;
 use base qw(Biome);
 use Item::Rock;
 
-sub _initialize {
+sub initialize {
     my $self = shift;
-    $self->SUPER::_initialize();
+    $self->SUPER::initialize();
     if ( rand() < .8 ) {
-        my $rock = Item::Rock->_new();
-        $self->_add_item($rock);
+        my $rock = Item::Rock->new();
+        $self->add_item($rock);
     }
     return $self;
 }

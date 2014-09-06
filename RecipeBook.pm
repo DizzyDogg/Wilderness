@@ -7,7 +7,7 @@ use warnings;
 
 use Data::Dumper;
 
-sub _new {
+sub new {
     my $package = shift;
     my $self = {@_};
     bless $self, $package;
@@ -29,37 +29,37 @@ foreach my $dir (@dirs) {
         $product = lc($product);
         require $path;
         $recipe->{$product}->{'package'} = $package || '';
-        $recipe->{$product}->{'ingredients'} = [ $package->_get_ingredients() ];
-        $recipe->{$product}->{'tools'} = [ $package->_get_tools() ];
-        $recipe->{$product}->{'process'} = $package->_process() || '';
+        $recipe->{$product}->{'ingredients'} = [ $package->get_ingredients() ];
+        $recipe->{$product}->{'tools'} = [ $package->get_tools() ];
+        $recipe->{$product}->{'process'} = $package->process() || '';
     }
 }
 
-sub _has_recipe {
+sub has_recipe {
     my $self = shift;
     my $product = shift;
     return $recipe->{"$product"} ? $recipe->{"$product"} : undef;
 }
 
-sub _get_package {
+sub get_package {
     my $self = shift;
     my $product = shift;
     return $recipe->{$product}->{'package'};
 }
 
-sub _get_ingredients {
+sub get_ingredients {
     my $self = shift;
     my $product = shift;
     return @{$recipe->{$product}->{'ingredients'}};
 }
 
-sub _get_tools {
+sub get_tools {
     my $self = shift;
     my $product = shift;
     return @{$recipe->{$product}->{'tools'}};
 }
 
-sub _get_process {
+sub get_process {
     my $self = shift;
     my $product = shift;
     return $recipe->{$product}->{'process'};

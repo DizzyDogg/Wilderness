@@ -5,6 +5,6 @@ use warnings;
 
 use base qw(Place);
 
-sub _is_obstruction { return 1 }
+sub is_obstruction { return 1 }
 
 1;
