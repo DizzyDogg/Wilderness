@@ -87,7 +87,7 @@ sub chop {
     my $self = shift;
     my $item = shift;
     my $here = $self->_where();
-    my @containers = $self->_visible_containers($item);
+    my @containers = $here->_visible_containers($item);
     return warn "\tYou cannot see any $item\n" unless $self->_can_see($item);
     return warn "\tA $item is not something that can be chopped\n" unless $item->_is_choppable();
     return warn "\tThe $item is not in a choppable state\n" if $item->_is_item() && $here->_has_on_ground($item);
