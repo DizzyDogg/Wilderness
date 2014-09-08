@@ -8,6 +8,8 @@ use Data::Dumper;
 use Item::Knife;
 use Item::Map;
 
+sub is_player { return 1 }
+
 sub initialize {
     my $self = shift;
     $self->SUPER::initialize();
@@ -18,12 +20,6 @@ sub initialize {
     return $self;
 }
 
-sub quit {
-    warn "\tI hope you enjoyed your stay in the Wilderness of Awesome !!!\n";
-    exit }
-
-sub is_player { return 1 }
-
 sub str2obj {
     my $self = shift;
     my @args = @_;
@@ -33,6 +29,61 @@ sub str2obj {
     }
     return @objs;
 }
+
+my %verbs = (
+    attack  => 'kill',
+    build   => 'make',
+    chop    => 'chop',
+    craft   => 'make',
+    create  => 'make',
+    die     => 'die',
+    examine => 'examine',
+    exit    => 'go',
+    get     => 'take',
+    give    => 'give',
+    go      => 'go',
+    grab    => 'take',
+    have    => 'inventory',
+    help    => 'help',
+    inventory => 'inventory',
+    kill    => 'kill',
+    look    => 'look',
+    make    => 'make',
+    move    => 'go',
+    pickup  => 'take',
+    place   => 'put',
+    put     => 'put',
+    retrieve => 'take',
+    say     => 'say',
+    slay    => 'slay',
+    speak   => 'say',
+    take    => 'take',
+    talk    => 'say',
+    travel  => 'go',
+    quit    => 'quit',
+    walk    => 'go',
+);
+
+sub get_verb {
+    my $self = shift;
+    my $verb = shift;
+    my $command = $verbs{$verb};
+    return $command;
+}
+
+sub help {
+    print "\nHere is a list of ALL the commands this prompt will recognize\n";
+    my @commands = sort keys %verbs;
+    while (@commands) {
+        my @cmds = splice @commands, 0, 7;
+        my $line = join "\t", @cmds;
+        print "\t$line\n";
+    }
+}
+
+sub quit {
+    warn "\tI hope you enjoyed your stay in the Wilderness of Awesome !!!\n";
+    exit }
 
 sub give {
     my ($self, $item, $to, $receiver) = @_;
@@ -209,11 +260,11 @@ sub say {
     return $self;
 }
 
-sub kill { shift->kill(kill => @_) }
+sub kill { shift->_kill(kill => @_) }
 
-sub slay { shift->kill(slay => @_) }
+sub slay { shift->_kill(slay => @_) }
 
-sub kill {
+sub _kill {
     my $self = shift;
     my $word = shift;
     my ($baddie, $with, $item) = (@_);

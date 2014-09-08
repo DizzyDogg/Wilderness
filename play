@@ -11,27 +11,9 @@ my $world = World->new();
 my $player = Player->new(location => $world->{'grid'}->{'0,0,0'});
 $world->{'grid'}->{'0,0,0'}->add_item($player);
 
-my %alternates = (
-    have    => 'inventory',
-    grab    => 'take',
-    get     => 'take',
-    pickup  => 'take',
-    retrieve => 'take',
-    walk    => 'go',
-    travel  => 'go',
-    move    => 'go',
-    exit    => 'go',
-    attack  => 'kill',
-    speak   => 'say',
-    talk    => 'say',
-    create  => 'make',
-    craft   => 'make',
-    build   => 'make',
-    place   => 'put',
-);
-
 print "\n\nWelcome to the World of Awesome.\n";
-print "Do you have what it takes to survive?\n\n";
+print "So far, the most advanced thing you can do is make fire\n";
+print "You may type 'help' for an overwhelming list of available commands\n\n";
 
 # The introductory statement
 $player->look();
@@ -48,7 +30,8 @@ while ( my ($verb, @arguments) = prompt() ) {
             if $verb eq '_empty_';
         next;
     }
-    if ( my $m = $player->can($alternates{$verb} || $verb) ) {
+    my $command = $player->get_verb($verb);
+    if ( my $m = defined $command && $player->can($command) ) {
         my @args = $player->str2obj(@arguments);
         $player->$m(@args);
     }
@@ -57,7 +40,6 @@ while ( my ($verb, @arguments) = prompt() ) {
     }
 }
 
-# Modify prompt to not return until it gets an input
 sub prompt {
     print "\nWhat would you like to do? ";
     my $command = <STDIN>;
