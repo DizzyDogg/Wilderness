@@ -16,10 +16,12 @@ sub required_weight { return 5 }
 sub initialize {
     my $self = shift;
     $self->SUPER::initialize();
-    my $stick = Item::Stick->new();
-    $self->visible_add($stick);
-    $self->visible_add($stick);
-    $self->visible_add($stick);
+    my $stick1 = Item::Stick->new();
+    my $stick2 = Item::Stick->new();
+    my $stick3 = Item::Stick->new();
+    $self->visible_add($stick1);
+    $self->visible_add($stick2);
+    $self->visible_add($stick3);
     return $self;
 }
 
