@@ -11,11 +11,16 @@ sub desc {
     ."\tYou could use its wood to make things.";
 }
 
+sub required_action { return 'chop' }
+
+sub required_sharpness { return 15 }
+sub required_weight { return 25 }
+
 sub initialize {
     my $self = shift;
     $self->SUPER::initialize();
     my $branch = Item::Branch->new();
-    $self->equipment_add($branch);
+    $self->visible_add($branch);
     return $self;
 }
 
