@@ -14,7 +14,7 @@ sub initialize {
     my $self = shift;
     $self->SUPER::initialize();
     my $knife = Item::Knife->new();
-    $self->equipment_add($knife);
+    $self->visible_add($knife);
     my $map = Item::Map->new();
     $self->inventory_add($map);
     return $self;
@@ -37,6 +37,7 @@ my %verbs = (
     craft   => 'make',
     create  => 'make',
     die     => 'die',
+    equip   => 'equip',
     examine => 'examine',
     exit    => 'go',
     get     => 'take',
@@ -53,6 +54,7 @@ my %verbs = (
     pickup  => 'take',
     place   => 'put',
     put     => 'put',
+    recipe  => 'recipe',
     retrieve => 'take',
     say     => 'say',
     slay    => 'slay',
@@ -60,6 +62,7 @@ my %verbs = (
     take    => 'take',
     talk    => 'say',
     travel  => 'go',
+    unequip => 'unequip',
     quit    => 'quit',
     walk    => 'go',
 );
@@ -89,14 +92,13 @@ sub give {
     my ($self, $item, $to, $receiver) = @_;
     return warn "\tGive what to whom?\n" unless $item;
     return warn "\tYou have no $item to give\n" unless $self->has($item);
-    return warn "\tYou must unequip the $item before you can give it away\n" unless $self->has_in($item);
     return warn "\tGive $item to whom?\n" unless ref $receiver;
     # see if this warn spews on characters that do not exist anywhere
     return warn "\tSorry ... there is no $receiver here\n"
         unless ( $self->has($receiver) or ( $receiver->where() eq $self->where() ) );
 
-    $self->{'hidden'}->remove($item);
-    $receiver->{'hidden'}->add($item);
+    $self->{'inventory'}->remove($item);
+    $receiver->{'inventory'}->add($item);
     print "\tYou say 'goodbye' as you part with the $item, holding back the tears\n";
     return $self;
 }
@@ -117,16 +119,16 @@ sub go {
 sub inventory {
     my $self = shift;
     my @args = @_;
-    my @equipment = $self->get_equipment();
+    my @visible = $self->get_visible();
     my @inventory = $self->get_inventory();
-    my @possessions = ( @equipment, @inventory );
+    my @possessions = ( @visible, @inventory );
     print "\tYou have ... nothing\n" unless @possessions;
     foreach my $item ( @inventory ) {
         # my $how_many = $possessions->{$item} == 1 ? 'a' : $possessions->{$item};
         # $item .= 's' if $how_many ne 'a';
         print "\tYou have a $item in your pack\n";
     }
-    foreach my $item ( @equipment ) {
+    foreach my $item ( @visible ) {
         # my $how_many = $possessions->{$item} == 1 ? 'a' : $possessions->{$item};
         # $item .= 's' if $how_many ne 'a';
         print "\tYou have a $item in your hand\n";
@@ -163,10 +165,10 @@ sub put {
     return warn "\tI do not know what a $receiver is\n" unless ref $receiver;
     return warn "\tYou do not have a $thing to put $in_on that $receiver\n" unless $self->has($thing);
     return warn "\tYou cannot see a $receiver here\n" unless $self->can_see($receiver);
-    my $lost = $self->equipment_remove($thing) || $self->inventory_remove($thing);
+    my $lost = $self->visible_remove($thing) || $self->inventory_remove($thing);
     if ( $lost ) {
         $receiver->inventory_add($thing) if $in_on eq 'in';
-        $receiver->equipment_add($thing) if $in_on eq 'on';
+        $receiver->visible_add($thing) if $in_on eq 'on';
     }
     print "\tYou carefully put the $thing $in_on the $receiver\n";
     return;
@@ -180,7 +182,7 @@ sub take {
     return warn "\tThere's no $what here\n" unless ref $what;
     return warn "\tUmm ... What did you actually expect that to do?\n" if $what->is_player();
     foreach my $baddie (@baddies) {
-        return warn "\tUmmm ... That is currently in someone's possession\n" if $baddie->has_on($what);
+        return warn "\tUmmm ... That is currently in someone's possession\n" if $baddie->has_in_visible($what);
     }
     if ( $what->is_character() ) {
         print "\tSeriously? ... you really want that $what?\n";
@@ -197,13 +199,13 @@ sub take {
     }
     # return warn "\tYou already have the $what\n" unless
     if ( $cont ) {
-        my $removed = $cont->equipment_remove($what) || $cont->remove_item($what);
+        my $removed = $cont->visible_remove($what) || $cont->remove_item($what);
         return warn "\t$what could not be removed\n" unless $removed;
         my $added = $self->inventory_add($what);
         return warn "\t$what could not be added to your inventory\n" unless $added;
         return warn "\tYou now have the $what\n";
     }
-    my $mine = $self->has_on($what) || $self->has_in($what);
+    my $mine = $self->has_in_visible($what) || $self->has_in_inventory($what);
     return warn "\tAll the $what you can see is already in your possession\n" if $mine;
     return warn "\tTaking $what did not work\n";
 }
@@ -272,7 +274,7 @@ sub _kill {
     return warn "\t\u${word} who with what?\n" unless ref $baddie;
     return warn "\t\uWhat will you kill the $baddie with?\n" unless ref $item;
     return warn "\tYou don't have a $item\n" unless $self->has($item);
-    return warn "\tYou must equip your $item before you may use it\n" unless $self->has_on($item);
+    return warn "\tYou must equip your $item before you may use it\n" unless $self->has_in_visible($item);
     return warn "\tThe $baddie is not something that can be killed\n" unless $baddie->get_health();
     return warn "\tThere is no $baddie here\n" unless $baddie->where() eq $here;
     return warn "\tWhy would you kill the poor innocent $baddie?\n"
