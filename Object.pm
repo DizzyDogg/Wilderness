@@ -187,6 +187,7 @@ sub process {
 }
 
 sub get_ingredients { return }
+sub get_consumables { return }
 sub get_tools { return }
 
 sub get_sub_description {
@@ -298,7 +299,7 @@ sub has_on_ground {
 
 sub get_all {
     my $self = shift;
-    my @possessions = ( $self->get_visible(), $self->get_inventory() );
+    my @possessions = ( $self->get_visible(), $self->get_inventory(), $self->get_composition() );
     return @possessions;
 }
 
