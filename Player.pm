@@ -10,13 +10,13 @@ use Item::Map;
 
 sub is_player { return 1 }
 
+sub mass { return 75 }
+
 sub initialize {
     my $self = shift;
     $self->SUPER::initialize();
-    my $knife = Item::Knife->new();
-    $self->visible_add($knife);
-    my $map = Item::Map->new();
-    $self->inventory_add($map);
+    $self->visible_add( Item::Knife->new() );
+    $self->inventory_add( Item::Map->new() );
     return $self;
 }
 
