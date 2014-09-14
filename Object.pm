@@ -213,6 +213,8 @@ sub equip {
     return warn "\tI do not know what a $item is\n" unless ref $item;
     return warn "\tYou already have a $item equipped\n" if $self->has_in_visible($item);
     return warn "\tYou do not have a $item to equip\n" unless $self->has_in_inventory($item);
+    my @equipped = $self->get_visible();
+    return warn "\tSorry, you only have two hands and they are both full\n" if @equipped >= 2;
     $self->inventory_remove($item);
     $self->visible_add($item);
     print "\tYou take the $item out of your pack and place it in your hand\n";
