@@ -16,6 +16,7 @@ sub is_character { return 1 }
 
 sub initialize {
     my $self = shift;
+    # create and add each individual meat and hide and bone, make carcass and define living animals
     $self->SUPER::initialize();
     $self->composition_add( Health->new(durability => $self->mass()) );
     $self->composition_add( Item::Meat->new(quantity => int($self->mass() / 10)) );

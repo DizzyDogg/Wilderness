@@ -55,13 +55,16 @@ sub new {
     $self->{'inventory'} = Container->new();
     $self->{'visible'} = Container->new();
     $self->{'composition'} = Container->new();
+    # "constitution" vs "composition"?
     bless $self, $package;
     $self->initialize();
     $self->{'name'} ||= $name;
+    $self->{'remaining_durability'} = $self->durability();
+    $self->{'remaining_cut_points'} = $self->cut_points();
     return $self;
 }
 
-sub initialize { }
+sub initialize { return }
 
 sub is_item { return }
 sub is_character { return }
@@ -74,7 +77,9 @@ sub is_obstruction { return }
 #find a way to check the 'required_action' instead of 'is_choppable'
 sub is_choppable { return }
 
-sub get_health { undef }
+sub get_health { return 0 }
+sub durability { return 0 }
+sub cut_points { return 0 }
 
 sub name {
     my $self = shift;
@@ -91,6 +96,106 @@ sub has_requirements {
     return $self->required_sharpness()
         || $self->required_weight()
         ;
+}
+
+sub get_damage_points {
+    my $self = shift;
+    my @weapon = shift;
+    my $type = 'cut';
+    my $amount = 10;
+    # my $type2 = 'cut';
+    # my $amount2 = 10;
+    my $damage = {
+        $type => $amount,
+        # $type2 => $amount2,
+    };
+    return $damage;
+}
+
+sub apply_damage {
+    my $self = shift;
+    my $damage = shift;
+    foreach my $type (keys $damage) {
+        my $apply = "apply_${type}_damage";
+        my $hit = $self->$apply($damage->{'type'});
+        warn "\tCannot apply $type damage\n" unless $hit;
+    }
+}
+
+sub apply_cut_damage {
+    my $self = shift;
+    my $amount = shift;
+    my $cut_points = $self->{'remaining_cut_points'};
+    my ($first) = $self->get_composition();
+    if ( $cut_points ) {
+        $cut_points -= $amount;
+        if ( $cut_points <= 0 ) {
+            $self->{'remaining_cut_points'} = 0;
+            # Make it fall
+            $amount = -$cut_points;
+        }
+        else {
+            $self->{'remaining_cut_points'} = $cut_points;
+            $amount = 0;
+        }
+        return $amount;
+    }
+    if ( $first ) {
+        return $first->apply_cut_damage($amount);
+    }
+
+    $self->{'remaining_durability'} -= $amount;
+    if ( $self->{'remaining_durability'} <= 0 ) {
+        # DESTROY $self
+        if ( $self->{'remaining_durability'} < 0 ) {
+            # apply to next thing
+        }
+    }
+}
+
+sub apply_bludgeon_damage {
+    my $self = shift;
+    my $amount = shift;
+    return $amount unless $amount;
+    my @items = $self->get_composition();
+    if ( @items ) {
+        foreach my $item ( @items ) {
+            $item->apply_bludgeon_damage($amount);
+        }
+        return $amount;
+    }
+    else {
+        my $half = ceil($amount / 2);
+        if ( $self->{'remaining_durability'} > $half ) {
+            $self->{'remaining_durability'} -= $half;
+            $amount -= $half;
+        }
+        else {
+            $amount -= $self->{'remaining_durability'};
+            $self->{'remaining_durability'} = 0;
+            $self->destroy();
+        }
+        return $amount;
+    }
+    return warn "I made it to the end of bludgeon, what do I do here?";
+}
+
+# I am not ready to actually implement this yet
+sub apply_fire_damage {
+    my $self = shift;
+    my $amount = shift;
+    my @items = $self->get_composition();
+    if ( @items ) {
+        foreach my $item (@items) {
+            $item->apply_fire_damage($amount);
+        }
+    }
+    else {
+        $self->{'remaining_durability'} -= $amount;
+        if ( $self->{'remaining_durability'} <= 0 ) {
+            # destroy $self
+        }
+    }
 }
 
 sub has_can_damage {
