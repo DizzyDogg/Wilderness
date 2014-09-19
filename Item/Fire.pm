@@ -8,8 +8,9 @@ use base qw(Item);
 sub desc { "You just stare at it mezmorized by the dancing flames" }
 
 sub get_ingredients { return qw(stick branch) }
-
 sub get_tools { return 'bow' }
+
+sub required_composition { qw(stick) } # some amount of wood
 
 sub process {
     return "You wrap the stick within the cord of the bow and set the\n"

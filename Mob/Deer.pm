@@ -9,10 +9,11 @@ use Item::Venison;
 
 sub desc { "The deer seems cute and kind ... but the sight of him makes you hungry" }
 
-sub weight { return 60 }
+sub mass { return 60 }
 
 sub initialize {
     my $self = shift;
+    $self->SUPER::initialize();
     my $hide = Item::Hide->new();
     $self->composition_add($hide);
     my $venison = Item::Venison->new();
