@@ -6,10 +6,12 @@ use warnings;
 use World;
 use Player;
 use Data::Dumper;
+use History;
 
 my $world = World->new();
 my $player = Player->new(location => $world->{'grid'}->{'0,0,0'});
 $world->{'grid'}->{'0,0,0'}->add_item($player);
+my $command_history = History->new();
 
 print "\n\nWelcome to the World of Awesome.\n";
 print "So far, the most advanced thing you can do is make fire\n";
@@ -44,6 +46,8 @@ sub prompt {
     print "\nWhat would you like to do? ";
     my $command = <STDIN>;
     chomp $command;
+    $command_history->add($command);
+
     return "_" if $command =~ /\_/;
     return "_empty_" if $command =~ /^\s*$/;
     $command = lc $command;
