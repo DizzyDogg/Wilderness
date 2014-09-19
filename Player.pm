@@ -31,7 +31,7 @@ sub str2obj {
 }
 
 my %verbs = (
-    attack  => 'kill',
+    attack  => 'attack',
     build   => 'make',
     chop    => 'chop',
     craft   => 'make',

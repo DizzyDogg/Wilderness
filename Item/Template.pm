@@ -19,11 +19,11 @@ sub get_tools { return qw(tool1 tool2) }
 
 # requirements to free up this item so it can be obtained
 # sub required_sharpness { 10 }
-# sub required_weight { 5 }
+# sub required_mass { 5 }
 
 # abilities of this item
 # sub sharpness { 10 }
-# sub weight { 5 }
+# sub mass { 5 }
 
 # # Populate the object with anything it contains
 # sub initialize {

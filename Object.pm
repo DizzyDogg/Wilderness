@@ -87,14 +87,14 @@ sub name {
 }
 
 sub required_sharpness { return 0 }
-sub required_weight { return 0 }
+sub required_mass { return 0 }
 sub sharpness { return 0 }
-sub weight { return 0 }
+sub mass { return 0 }
 
 sub has_requirements {
     my $self = shift;
     return $self->required_sharpness()
-        || $self->required_weight()
+        || $self->required_mass()
         ;
 }
 
@@ -117,7 +117,7 @@ sub apply_damage {
     my $damage = shift;
     foreach my $type (keys $damage) {
         my $apply = "apply_${type}_damage";
-        my $hit = $self->$apply($damage->{'type'});
+        my $hit = $self->$apply($damage->{$type});
         warn "\tCannot apply $type damage\n" unless $hit;
     }
 }
@@ -126,6 +126,7 @@ sub apply_cut_damage {
     my $self = shift;
     my $amount = shift;
     my $cut_points = $self->{'remaining_cut_points'};
+    print $self, $cut_points;
     my ($first) = $self->get_composition();
     if ( $cut_points ) {
         $cut_points -= $amount;
@@ -177,7 +178,7 @@ sub apply_bludgeon_damage {
         }
         return $amount;
     }
-    return warn "I made it to the end of bludgeon, what do I do here?";
+    return warn "I made it to the end of bludgeon, what do I do here? I think I blew through the entire object.";
 }
 
 # I am not ready to actually implement this yet
@@ -213,10 +214,10 @@ sub can_damage {
     my $self = shift;
     my $victim = shift;
     my $sharp = $self->sharpness();
-    my $weight = $self->weight();
+    my $mass = $self->mass();
     my $req_sharp = $victim->required_sharpness();
-    my $req_weight = $victim->required_weight();
-    return $sharp >= $req_sharp && $weight >= $req_weight;
+    my $req_mass = $victim->required_mass();
+    return $sharp >= $req_sharp && $mass >= $req_mass;
 }
 
 # Same as is_here, but skipping characters and their visible.

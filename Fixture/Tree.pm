@@ -15,7 +15,7 @@ sub desc {
 # sub required_action { return 'chop' }
 
 # sub required_sharpness { return 15 }
-# sub required_weight { return 25 }
+# sub required_mass { return 25 }
 
 sub cut_points { return 50 }
 
