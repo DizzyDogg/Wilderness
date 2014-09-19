@@ -7,18 +7,21 @@ use base qw(Item);
 use Item::Stick;
 
 sub required_action { return 'chop' }
+
 sub required_sharpness { return 10 }
 sub required_weight { return 5 }
 
-sub is_choppable { return 1 }
+# sub is_choppable { return 1 }
 
 sub initialize {
     my $self = shift;
     $self->SUPER::initialize();
-    my $stick = Item::Stick->new();
-    $self->equipment_add($stick);
-    $self->equipment_add($stick);
-    $self->equipment_add($stick);
+    my $stick1 = Item::Stick->new();
+    my $stick2 = Item::Stick->new();
+    my $stick3 = Item::Stick->new();
+    $self->visible_add($stick1);
+    $self->visible_add($stick2);
+    $self->visible_add($stick3);
     return $self;
 }
 

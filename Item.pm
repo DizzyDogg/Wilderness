@@ -11,7 +11,7 @@ sub is_item { return 1 }
 
 sub prior_action {
     my $self = shift;
-    my $do = $self->_required_action();
+    my $do = $self->required_action();
     return "\tFirst you must $do the $self\n";
 }
 

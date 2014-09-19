@@ -13,11 +13,11 @@ sub initialize {
     my $self = shift;
     $self->SUPER::initialize();
     my $berry = Item::Berry->new();
-    $self->equipment_add($berry);
-    $self->equipment_add($berry);
-    $self->equipment_add($berry);
-    $self->equipment_add($berry);
-    $self->equipment_add($berry);
+    $self->visible_add($berry);
+    $self->visible_add($berry);
+    $self->visible_add($berry);
+    $self->visible_add($berry);
+    $self->visible_add($berry);
     return $self;
 }
 1;

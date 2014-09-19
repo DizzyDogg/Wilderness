@@ -11,7 +11,7 @@ sub is_place { return 1 }
 # to add exits between rooms that exist and rooms I am creating
 sub initialize {
     my $self = shift;
-    delete $self->{'hidden'};
+    delete $self->{'inventory'};
     return $self;
 }
 

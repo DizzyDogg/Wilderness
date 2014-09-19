@@ -30,7 +30,7 @@ sub get_tools { return qw(tool1 tool2) }
 #     my $self = shift;
 #     $self->SUPER::initialize();
 #     my $sub_item = Item::SubItem->new();
-#     $self->equipment_add($sub_item);
+#     $self->visible_add($sub_item);
 #     return $self;
 # }
 
