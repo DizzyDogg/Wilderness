@@ -12,7 +12,7 @@ sub desc {
 
 sub get_ingredients { return qw{handaxe stick cord} }
 
-sub weight { return 5 }
+sub mass { return 5 }
 sub sharpness { return 10 }
 
 sub process {

@@ -1,4 +1,4 @@
-package Item::Hide;
+package Item::Meat;
 
 use strict;
 use warnings;

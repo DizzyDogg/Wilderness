@@ -1,4 +1,4 @@
-package Item::Stick;
+package Item::Kindling;
 
 use strict;
 use warnings;

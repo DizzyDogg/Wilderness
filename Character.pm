@@ -4,13 +4,26 @@ use strict;
 use warnings;
 
 use base qw(Object);
+use Health;
+use Item::Bone;
+use Item::Meat;
+use Item::Hide;
 use RecipeBook;
 
 use Data::Dumper;
 
 sub is_character { return 1 }
 
-sub get_health { return 1 }
+sub initialize {
+    my $self = shift;
+    # create and add each individual meat and hide and bone, make carcass and define living animals
+    $self->SUPER::initialize();
+    $self->composition_add( Health->new(durability => $self->mass()) );
+    $self->composition_add( Item::Meat->new(quantity => int($self->mass() / 10)) );
+    $self->composition_add( Item::Hide->new(quantity => int($self->mass() / 15)) );
+    $self->composition_add( Item::Bone->new(quantity => int($self->mass() / 20)) );
+    return $self;
+}
 
 my $recipe_book = RecipeBook->new();
 

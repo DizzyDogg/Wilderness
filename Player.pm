@@ -10,13 +10,13 @@ use Item::Map;
 
 sub is_player { return 1 }
 
+sub mass { return 75 }
+
 sub initialize {
     my $self = shift;
     $self->SUPER::initialize();
-    my $knife = Item::Knife->new();
-    $self->visible_add($knife);
-    my $map = Item::Map->new();
-    $self->inventory_add($map);
+    $self->visible_add( Item::Knife->new() );
+    $self->inventory_add( Item::Map->new() );
     return $self;
 }
 
@@ -31,7 +31,7 @@ sub str2obj {
 }
 
 my %verbs = (
-    attack  => 'kill',
+    attack  => 'attack',
     build   => 'make',
     chop    => 'chop',
     craft   => 'make',
@@ -257,9 +257,22 @@ sub examine {
 sub say {
     my $self = shift;
     print "\tYou mutter for a bit ... and realize you are talking to youself\n"
-          ."\tYou decide that you can indeed still talk\n"
-          ."\tBut, you shake your head and refocus your efforts on surviving\n";
+        . "\tYou decide that you can indeed still talk\n"
+        . "\tBut, you shake your head and refocus your efforts on surviving\n";
     return $self;
+}
+
+sub attack {
+    my $self = shift;
+    my $victim = shift;
+    my @equipped = $self->get_visible();
+    return warn "\tYou should really equip something before attempting this\n" unless @equipped;
+    foreach my $weapon (@equipped) {
+        print "\tYou swing your $weapon at the $victim\n";
+        my $damage = $self->get_damage_points($weapon);
+        $victim->apply_damage($damage);
+        # print something about current health of $victim
+    }
 }
 
 sub kill { shift->_kill(kill => @_) }
@@ -278,9 +291,9 @@ sub _kill {
     return warn "\tThe $baddie is not something that can be killed\n" unless $baddie->get_health();
     return warn "\tThere is no $baddie here\n" unless $baddie->where() eq $here;
     return warn "\tWhy would you kill the poor innocent $baddie?\n"
-                . "\tIt hasn't done anything to anyone\n" unless $baddie->is_character();
+              . "\tIt hasn't done anything to anyone\n" unless $baddie->is_character();
     return warn "\tUh ... I am pretty sure suicide is illegal\n"
-                . "\tand generally considered bad for your health\n" if $baddie == $self;
+              . "\tand generally considered bad for your health\n" if $baddie == $self;
 
     # now we add its inventory to the room's inventory
     print "\u\tYou ${word}ed the $baddie\n";
