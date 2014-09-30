@@ -78,6 +78,20 @@ sub is_place { return }
 sub is_biome { return }
 sub is_obstruction { return }
 
+sub is_attached {
+    my $self = shift;
+    my $points = $self->{'cut_points'};
+    my $attached = ( defined $points && $points > 0 ) ? 1 : 0;
+    return $attached;
+}
+
+sub is_alive {
+    my $self = shift;
+    my @comps = $self->get_composition() || ();
+    my $alive = (@comps && $comps[0] eq 'health');
+    return $alive;
+}
+
 #find a way to check the 'required_action' instead of 'is_choppable'
 sub is_choppable { return }
 
@@ -271,6 +285,19 @@ sub drop {
     $here->add_item($what);
     print "\tYou place the $what gently on the ground\n" if $self->is_player();
     return $self;
+}
+
+sub drop_all {
+    my $self = shift;
+    my @items = ($self->get_inventory(), $self->get_visible());
+    foreach my $item (@items) {
+        $self->drop($item);
+    }
+    my @comp_items = $self->get_composition();
+    foreach my $item (@comp_items) {
+        $item->detach();
+    }
+    return (@items, @comp_items);
 }
 
 # takes an item from container (compositionally) and places it on the ground
@@ -476,8 +503,9 @@ sub get_all {
 
 sub destroy {
     my $self = shift;
-    my @items = $self->get_all();
-    $self->{'location'}->remove_item($self);
+    my @items = $self->drop_all();
+    $self->{'location'}->visible_remove($self);
+    warn "\tYou destroyed the $self\n";
     undef $self;
     return @items;
 }

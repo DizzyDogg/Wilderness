@@ -301,7 +301,7 @@ sub _kill {
     return warn "\t\uWhat will you kill the $baddie with?\n" unless ref $item;
     return warn "\tYou don't have a $item\n" unless $self->has($item);
     return warn "\tYou must equip your $item before you may use it\n" unless $self->has_in_visible($item);
-    return warn "\tThe $baddie is not something that can be killed\n" unless $baddie->get_health();
+    return warn "\tThe $baddie is not something that can be killed\n" unless $baddie->is_alive();
     return warn "\tThere is no $baddie here\n" unless $baddie->where() eq $here;
     return warn "\tWhy would you kill the poor innocent $baddie?\n"
               . "\tIt hasn't done anything to anyone\n" unless $baddie->is_character();

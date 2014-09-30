@@ -11,6 +11,14 @@ sub desc {
     return "This is a bush, the berries could be tasty... or DEATH";
 }
 
+sub max_cut_points { return 20 }
+
+sub attach {
+    my $self = shift;
+    my $max = $self->max_cut_points();
+    return $self->cut_points($max);
+}
+
 sub required_composition { qw{stick stick stick} }
 
 sub initialize {
