@@ -13,6 +13,7 @@ use RecipeBook;
 use Data::Dumper;
 
 sub is_character { return 1 }
+sub required_composition { return qw{health} }
 
 sub initialize {
     my $self = shift;

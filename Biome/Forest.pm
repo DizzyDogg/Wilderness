@@ -11,7 +11,7 @@ sub initialize {
     my $self = shift;
     $self->SUPER::initialize();
     my $random = rand();
-    my $tree = Fixture::Tree->new();
+    my $tree = Fixture::Tree->new(attached => 1);
         $self->add_item($tree);
     if ( $random < .6 ) {
         my $deer = Mob::Deer->new();
