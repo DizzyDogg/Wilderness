@@ -59,8 +59,12 @@ sub new {
     bless $self, $package;
     $self->initialize();
     $self->{'name'} ||= $name;
-    $self->{'remaining_durability'} = $self->durability();
-    $self->{'remaining_cut_points'} = $self->cut_points();
+    $self->{'durability'} ||= $self->durability();
+    if ($self->{'attached'}) {
+        $self->attach();
+        delete $self->{'attached'};
+    }
+    $self->{'cut_points'} ||= $self->cut_points();
     return $self;
 }
 
@@ -79,7 +83,6 @@ sub is_choppable { return }
 
 sub get_health { return 0 }
 sub durability { return 0 }
-sub cut_points { return 0 }
 
 sub name {
     my $self = shift;
@@ -96,6 +99,13 @@ sub has_requirements {
     return $self->required_sharpness()
         || $self->required_mass()
         ;
+}
+
+sub cut_points {
+    my $self = shift;
+    my $points = shift;
+    $self->{'cut_points'} = $points if defined $points;
+    return $self->{'cut_points'};
 }
 
 sub get_damage_points {
@@ -117,40 +127,53 @@ sub apply_damage {
     my $damage = shift;
     foreach my $type (keys $damage) {
         my $apply = "apply_${type}_damage";
-        my $hit = $self->$apply($damage->{$type});
-        warn "\tCannot apply $type damage\n" unless $hit;
+        my @hit = $self->$apply($damage->{$type});
+        # I actually need to get apply_cut_damage to return the thing that was cut off as well, or the thing that was cut partially off, or that got destroyed.
+        warn "\tYou cut partially through the $self\n" if $hit[1] eq 'cut';
+
+        warn "\tYou damaged the $self\n" if $hit[1] eq 'damaged';
+        warn "\tCannot apply $type damage\n" unless $hit[1];
     }
 }
 
 sub apply_cut_damage {
     my $self = shift;
     my $amount = shift;
-    my $cut_points = $self->{'remaining_cut_points'};
-    print $self, $cut_points;
-    my ($first) = $self->get_composition();
+    my $cut_points = $self->{'cut_points'};
+    my $dur = $self->{'durability'};
+    # print $self, $cut_points, $dur;
     if ( $cut_points ) {
         $cut_points -= $amount;
         if ( $cut_points <= 0 ) {
-            $self->{'remaining_cut_points'} = 0;
-            # Make it fall
-            $amount = -$cut_points;
+            my $action = 'cut_off';
+            $self->detach();
+            $self->{'cut_points'} = 0;
+            # $amount = -$cut_points;
+            return ($self, $action);
         }
         else {
-            $self->{'remaining_cut_points'} = $cut_points;
-            $amount = 0;
+            $self->{'cut_points'} = $cut_points;
+            my $action = 'cut';
+            # $amount = 0;
+            return ($self, $action);
         }
-        return $amount;
     }
+    my ($first) = $self->get_composition();
     if ( $first ) {
         return $first->apply_cut_damage($amount);
     }
 
-    $self->{'remaining_durability'} -= $amount;
-    if ( $self->{'remaining_durability'} <= 0 ) {
-        # DESTROY $self
-        if ( $self->{'remaining_durability'} < 0 ) {
-            # apply to next thing
+    $self->{'durability'} -= $amount;
+    if ( $self->{'durability'} <= 0 ) {
+        $self->destroy();
+        my $action = 'destroyed';
+        if ( $self->{'durability'} < 0 ) {
+            # apply_cut_damage(top guy?) not sure how
         }
+        return ($self, $action);
+    }
+    else {
+        return 1;
     }
 }
 
@@ -167,13 +190,13 @@ sub apply_bludgeon_damage {
     }
     else {
         my $half = ceil($amount / 2);
-        if ( $self->{'remaining_durability'} > $half ) {
-            $self->{'remaining_durability'} -= $half;
+        if ( $self->{'durability'} > $half ) {
+            $self->{'durability'} -= $half;
             $amount -= $half;
         }
         else {
-            $amount -= $self->{'remaining_durability'};
-            $self->{'remaining_durability'} = 0;
+            $amount -= $self->{'durability'};
+            $self->{'durability'} = 0;
             $self->destroy();
         }
         return $amount;
@@ -192,8 +215,8 @@ sub apply_fire_damage {
         }
     }
     else {
-        $self->{'remaining_durability'} -= $amount;
-        if ( $self->{'remaining_durability'} <= 0 ) {
+        $self->{'durability'} -= $amount;
+        if ( $self->{'durability'} <= 0 ) {
             # destroy $self
         }
     }
@@ -238,6 +261,7 @@ sub can_reach {
     return 0;
 }
 
+# takes an item from your inventory or equipment and places it on the ground
 sub drop {
     my $self = shift;
     my $what = shift;
@@ -246,6 +270,18 @@ sub drop {
     $self->inventory_remove($what) || $self->visible_remove($what);
     $here->add_item($what);
     print "\tYou place the $what gently on the ground\n" if $self->is_player();
+    return $self;
+}
+
+# takes an item from container (compositionally) and places it on the ground
+sub detach {
+    my $self = shift;
+    my $container = $self->has_me();
+    my $here = $self->where();
+    return warn "\tThere is no $self to detach\n" unless ( $container->has_in_composition($self) || $container->has_in_visible($self) );
+    $container->composition_remove($self) || $container->visible_remove($self);
+    $here->add_item($self);
+    print "\tThe $self falls to the ground\n";
     return $self;
 }
 
@@ -273,9 +309,21 @@ sub has_in_composition {
     return $self->{'composition'}->contains($item);
 }
 
+# the thing that contains me
+sub has_me {
+    my $self = shift;
+    my @containers = $self->get_container_chain();
+    return $containers[1];
+}
+
+# the room that contains me
 sub where {
     my $self = shift;
-    return $self->{'location'};
+    my @containers = $self->get_container_chain();
+    foreach my $container (@containers) {
+        return $container if $container->is_place();
+    }
+    return;
 }
 
 sub desc {
@@ -361,6 +409,7 @@ sub _remove {
     my $item = shift;
     my $container = shift;
     my $removed = $self->{$container}->remove($item);
+    delete $item->{'location'} if $removed;
     return $removed;
 }
 
@@ -386,6 +435,8 @@ sub get_deep_visible {
     return @all_items;
 }
 
+# return a drill down list of containers starting from $self
+# and ending with the item (biggest to smallest)
 sub visible_containers {
     my $self = shift;
     my $find = shift;
@@ -396,6 +447,18 @@ sub visible_containers {
         return (@deep_items, $self) if @deep_items;
     }
     return;
+}
+
+# return a list of containers starting from $self and ending with the item
+# (smallest to biggest)
+sub get_container_chain {
+    my $self = shift;
+    my $container = $self->{'location'};
+    if ( ref $container ne 'ARRAY' ) {
+        my @chain = $container->get_container_chain();
+        return ($self, @chain);
+    }
+    return ($self, $container);
 }
 
 sub has_on_ground {
@@ -409,6 +472,14 @@ sub get_all {
     my $self = shift;
     my @possessions = ( $self->get_visible(), $self->get_inventory(), $self->get_composition() );
     return @possessions;
+}
+
+sub destroy {
+    my $self = shift;
+    my @items = $self->get_all();
+    $self->{'location'}->remove_item($self);
+    undef $self;
+    return @items;
 }
 
 1;

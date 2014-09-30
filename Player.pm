@@ -17,6 +17,7 @@ sub initialize {
     $self->SUPER::initialize();
     $self->visible_add( Item::Knife->new() );
     $self->inventory_add( Item::Map->new() );
+    $self->{'location'} = [0, 0, 0];
     return $self;
 }
 
@@ -228,7 +229,7 @@ sub look {
             print "\tThere is a $item here\n" if $item->is_fixture();
             print "\tA $item notices your presence\n" if $item->is_character();
         }
-        my $exits = $here->get_exits();
+        my $exits = $here->get_exits() if $here->is_place();
         print "\n";
         foreach my $exit (sort keys %$exits) {
             print ("\t\tTo the $exit, you see a $exits->{$exit}[0]\n") if $exits->{$exit}[0];
@@ -265,6 +266,7 @@ sub say {
 sub attack {
     my $self = shift;
     my $victim = shift;
+    return warn "\tAttack what?\n" unless ref $victim;
     my @equipped = $self->get_visible();
     return warn "\tYou should really equip something before attempting this\n" unless @equipped;
     foreach my $weapon (@equipped) {
@@ -298,15 +300,12 @@ sub _kill {
     # now we add its inventory to the room's inventory
     print "\u\tYou ${word}ed the $baddie\n";
     print "\tYou watch as the $baddie blinks out of existence\n";
-    my @loot = $baddie->get_all();
+    my @loot = $baddie->destroy();
     print "\t\tYou notice it has left:\n" if @loot;
     foreach my $item ( @loot ) {
         $here->add_item($item);
         warn "\t\tA $item\n";
     }
-    # and eliminate it
-    $here->remove_item($baddie);
-    # delete $baddie; Do I just leave it around with no location?
     return $self;
 }
 

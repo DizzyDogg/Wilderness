@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use base qw(Object);
+use Data::Dumper;
 
 sub is_place { return 1 }
 
@@ -27,6 +28,7 @@ sub remove_item {
     my $self = shift;
     my $item = shift;
     my $removed = $self->{'visible'}->remove($item);
+    delete $item->{'location'} if $removed;
     return $removed;
 }
 
@@ -43,8 +45,8 @@ sub get_items {
 
 sub get_exits {
     my $self = shift;
-    my $coords = $self->where();
-    my ($x, $y, $z) = split ',', $coords;
+    my $coords = $self->has_me();
+    my ($x, $y, $z) = @$coords;
     my $north1 = $self->{'world'}->{'grid'}->{join ',', $x, $y+1, $z};
     my $south1 = $self->{'world'}->{'grid'}->{join ',', $x, $y-1, $z};
     my $east1 = $self->{'world'}->{'grid'}->{join ',', $x+1, $y, $z};
