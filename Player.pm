@@ -193,14 +193,14 @@ sub take {
     }
     return warn "\tThe $what is relatively permanent ... sorry\n" if $what->is_fixture();
     return warn "\tThe $what is not somewhere you can reach\n" unless $self->can_reach($what);
-    my $cont = ($here->visible_containers($what))[1];
+    my $cont = $what->has_me();
     if ( $cont && $cont != $here && $what->has_requirements() ) {
         return warn "\tYou are not capable of taking the $what in its current state.\n"
                   . $what->prior_action();
     }
     # return warn "\tYou already have the $what\n" unless
     if ( $cont ) {
-        my $removed = $cont->visible_remove($what) || $cont->remove_item($what);
+        my $removed = $cont->visible_remove($what);
         return warn "\t$what could not be removed\n" unless $removed;
         my $added = $self->inventory_add($what);
         return warn "\t$what could not be added to your inventory\n" unless $added;
@@ -225,9 +225,20 @@ sub look {
         my @items = $here->get_items();
         foreach my $item ( @items ) {
             next if $item eq $self;
-            print "\tYou see a $item lying on the ground\n" if $item->is_item();
-            print "\tThere is a $item here\n" if $item->is_fixture();
-            print "\tA $item notices your presence\n" if $item->is_character();
+            if ( $item->is_character() ) {
+                if ( $item->is_alive() ) {
+                    print "\tA $item notices your presence\n";
+                }
+                else {
+                    print "\tYou see a $item lying on the ground\n";
+                }
+            }
+            elsif ( $item->is_attached() ) {
+                print "\tThere is a $item here\n";
+            }
+            else {
+                print "\tYou see a $item lying on the ground\n";
+            }
         }
         my $exits = $here->get_exits() if $here->is_place();
         print "\n";

@@ -24,14 +24,6 @@ sub add_item {
     return $added;
 }
 
-sub remove_item {
-    my $self = shift;
-    my $item = shift;
-    my $removed = $self->{'visible'}->remove($item);
-    delete $item->{'location'} if $removed;
-    return $removed;
-}
-
 sub has {
     my $self = shift;
     my $item = shift;
