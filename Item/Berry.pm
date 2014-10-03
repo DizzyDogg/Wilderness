@@ -6,11 +6,7 @@ use warnings;
 use base qw(Item);
 
 sub desc {
-    return "Descripton of what this item is.\n"
-        .  "\tThis description is what the player sees\n"
-        .  "\twhen they 'look' at it";
+    return "Those Berries look mighty tasty. You wonder if they are poisonous.\n"
 }
-
-
 
 1;

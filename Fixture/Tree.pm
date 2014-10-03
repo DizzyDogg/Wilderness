@@ -17,7 +17,7 @@ sub desc {
 # sub required_sharpness { return 15 }
 # sub required_mass { return 25 }
 
-sub required_composition { return qw{log} }
+sub required_composition { return qw{log log} }
 
 sub max_cut_points { return 50 }
 
