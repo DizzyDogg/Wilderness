@@ -19,7 +19,7 @@ sub initialize {
 sub add_item {
     my $self = shift;
     my $item = shift;
-    my $added = $self->{'visible'}->add($item);
+    my $added = $self->visible_add($item);
     $item->{'location'} = $self if $added;
     return $added;
 }
@@ -27,12 +27,12 @@ sub add_item {
 sub has {
     my $self = shift;
     my $item = shift;
-    return $self->{'visible'}->contains($item);
+    return $self->visible_contains($item);
 }
 
 sub get_items {
     my $self = shift;
-    return $self->{'visible'}->get_all();
+    return $self->visible_get();
 }
 
 sub get_exits {

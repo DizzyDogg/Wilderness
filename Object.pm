@@ -3,7 +3,6 @@ package Object;
 use strict;
 use warnings;
 
-use Container;
 use Data::Dumper;
 
 use overload
@@ -52,9 +51,9 @@ sub new {
     (my $path = $package) =~ s/::/\//;
     $path .= '.pm';
     require $path;
-    $self->{'inventory'} = Container->new();
-    $self->{'visible'} = Container->new();
-    $self->{'composition'} = Container->new();
+    $self->{'inventory'} = [];
+    $self->{'visible'} = [];
+    $self->{'composition'} = [];
     # "constitution" vs "composition"?
     bless $self, $package;
     $self->initialize();
@@ -77,6 +76,7 @@ sub is_player { return }
 sub is_place { return }
 sub is_biome { return }
 sub is_obstruction { return }
+sub required_composition { return () }
 
 sub is_attached {
     my $self = shift;
@@ -87,7 +87,7 @@ sub is_attached {
 
 sub is_alive {
     my $self = shift;
-    my @comps = $self->get_composition() || ();
+    my @comps = $self->composition_get() || ();
     my $alive = (@comps && $comps[0] eq 'health');
     return $alive;
 }
@@ -143,10 +143,9 @@ sub apply_damage {
         my $apply = "apply_${type}_damage";
         my @hit = $self->$apply($damage->{$type});
         # I actually need to get apply_cut_damage to return the thing that was cut off as well, or the thing that was cut partially off, or that got destroyed.
-        warn "\tYou cut partially through the $self\n" if $hit[1] eq 'cut';
-
-        warn "\tYou damaged the $self\n" if $hit[1] eq 'damaged';
-        warn "\tCannot apply $type damage\n" unless $hit[1];
+        print "\tYou cut partially through the $self\n" if $hit[1] eq 'cut';
+        print "\tYou damaged the $self\n" if $hit[1] eq 'damaged';
+        print "\tCannot apply $type damage\n" unless $hit[1];
     }
 }
 
@@ -155,7 +154,6 @@ sub apply_cut_damage {
     my $amount = shift;
     my $cut_points = $self->{'cut_points'};
     my $dur = $self->{'durability'};
-    # print $self, $cut_points, $dur;
     if ( $cut_points ) {
         $cut_points -= $amount;
         if ( $cut_points <= 0 ) {
@@ -172,7 +170,7 @@ sub apply_cut_damage {
             return ($self, $action);
         }
     }
-    my ($first) = $self->get_composition();
+    my ($first) = $self->composition_get();
     if ( $first ) {
         return $first->apply_cut_damage($amount);
     }
@@ -195,7 +193,7 @@ sub apply_bludgeon_damage {
     my $self = shift;
     my $amount = shift;
     return $amount unless $amount;
-    my @items = $self->get_composition();
+    my @items = $self->composition_get();
     if ( @items ) {
         foreach my $item ( @items ) {
             $item->apply_bludgeon_damage($amount);
@@ -215,14 +213,14 @@ sub apply_bludgeon_damage {
         }
         return $amount;
     }
-    return warn "I made it to the end of bludgeon, what do I do here? I think I blew through the entire object.";
+    return print "I made it to the end of bludgeon, what do I do here? I think I blew through the entire object.";
 }
 
 # I am not ready to actually implement this yet
 sub apply_fire_damage {
     my $self = shift;
     my $amount = shift;
-    my @items = $self->get_composition();
+    my @items = $self->composition_get();
     if ( @items ) {
         foreach my $item (@items) {
             $item->apply_fire_damage($amount);
@@ -239,11 +237,11 @@ sub apply_fire_damage {
 sub has_can_damage {
     my $self = shift;
     my $item = shift;
-    my @equips = $self->get_visible();
+    my @equips = $self->visible_get();
     foreach my $equip (@equips) {
         return $equip if $equip->can_damage($item);
     }
-    warn "\tYou have nothing equipped strong enough to affect the $item\n";
+    print "\tYou have nothing equipped strong enough to affect the $item\n";
     return;
 }
 
@@ -263,7 +261,7 @@ sub can_reach {
     my $thing = shift;
     my $place = $self->where();
     my @items = $place->get_items();
-    push @items, $self->get_inventory(), $self->get_visible();
+    push @items, $self->inventory_get(), $self->visible_get();
     foreach my $item (@items) {
         next if $item->is_character();
         return $item if $item eq $thing;
@@ -280,36 +278,45 @@ sub drop {
     my $self = shift;
     my $what = shift;
     my $here = $self->where();
-    return warn "\tYou don't have a $what\n" unless $self->has($what);
+    return print "\tYou don't have a $what\n" unless $self->has($what);
     $self->inventory_remove($what) || $self->visible_remove($what);
     $here->add_item($what);
     print "\tYou place the $what gently on the ground\n" if $self->is_player();
     return $self;
 }
 
-sub drop_all {
-    my $self = shift;
-    my @items = ($self->get_inventory(), $self->get_visible());
-    foreach my $item (@items) {
-        $self->drop($item);
-    }
-    my @comp_items = $self->get_composition();
-    foreach my $item (@comp_items) {
-        $item->detach();
-    }
-    return (@items, @comp_items);
-}
 
 # takes an item from container (compositionally) and places it on the ground
 sub detach {
     my $self = shift;
     my $container = $self->has_me();
     my $here = $self->where();
-    return warn "\tThere is no $self to detach\n" unless ( $container->has_in_composition($self) || $container->has_in_visible($self) );
-    $container->composition_remove($self) || $container->visible_remove($self);
+    if ( $container->has_in_composition($self) ) {
+        $container->composition_remove($self);
+    }
+    elsif ( $container->has_in_visible($self) ) {
+        $container->visible_remove($self);
+    }
+    else {
+        return print "\tThere is no $self to detach\n";
+    }
     $here->add_item($self);
     print "\tThe $self falls to the ground\n";
     return $self;
+}
+
+sub composition_check {
+    my $self = shift;
+    my $comp = {};
+    my $req_comp = {};
+    $comp->{ $_ }++ foreach $self->composition_get();
+    $req_comp->{ $_ }++ foreach $self->required_composition();
+    my $sufficient = 1;
+    foreach my $item (keys %$comp) {
+        do { $sufficient = 0; last; } if $comp->{$item} < $req_comp->{$item};
+    }
+    $self->destroy() unless $sufficient;
+    return $sufficient;
 }
 
 sub has {
@@ -321,19 +328,19 @@ sub has {
 sub has_in_inventory {
     my $self = shift;
     my $item = shift;
-    return $self->{'inventory'}->contains($item);
+    return $self->inventory_contains($item);
 }
 
 sub has_in_visible {
     my $self = shift;
     my $item = shift;
-    return $self->{'visible'}->contains($item);
+    return $self->visible_contains($item);
 }
 
 sub has_in_composition {
     my $self = shift;
     my $item = shift;
-    return $self->{'composition'}->contains($item);
+    return $self->composition_contains($item);
 }
 
 # the thing that contains me
@@ -373,12 +380,12 @@ sub get_tools { return }
 
 sub get_sub_description {
     my $self = shift;
-    my @items = $self->get_visible();
+    my @items = $self->visible_get();
     my @lines;
     if ( @items ) {
         foreach my $item (@items) {
             push @lines, "\tThe $self has a $item";
-            my @items_items = $item->get_visible();
+            my @items_items = $item->visible_get();
             foreach my $items_item (@items_items) {
                 push @lines, "\tThe $item has a $items_item";
             }
@@ -390,12 +397,12 @@ sub get_sub_description {
 sub equip {
     my $self = shift;
     my $item = shift;
-    return warn "\tWhat would you like to equip?\n" unless $item;
-    return warn "\tI do not know what a $item is\n" unless ref $item;
-    return warn "\tYou already have a $item equipped\n" if $self->has_in_visible($item);
-    return warn "\tYou do not have a $item to equip\n" unless $self->has_in_inventory($item);
-    my @equipped = $self->get_visible();
-    return warn "\tSorry, you only have two hands and they are both full\n" if @equipped >= 2;
+    return print "\tWhat would you like to equip?\n" unless $item;
+    return print "\tI do not know what a $item is\n" unless ref $item;
+    return print "\tYou already have a $item equipped\n" if $self->has_in_visible($item);
+    return print "\tYou do not have a $item to equip\n" unless $self->has_in_inventory($item);
+    my @equipped = $self->visible_get();
+    return print "\tSorry, you only have two hands and they are both full\n" if @equipped >= 2;
     $self->inventory_remove($item);
     $self->visible_add($item);
     print "\tYou take the $item out of your pack and place it in your hand\n";
@@ -405,55 +412,84 @@ sub equip {
 sub unequip {
     my $self = shift;
     my $item = shift;
-    return warn "\tWhat would you like to unequip?\n" unless $item;
-    return warn "\tI do not know what a $item is\n" unless ref $item;
-    return warn "\tYou do not have a $item equipped\n" unless $self->has_in_visible($item);
+    return print "\tWhat would you like to unequip?\n" unless $item;
+    return print "\tI do not know what a $item is\n" unless ref $item;
+    return print "\tYou do not have a $item equipped\n" unless $self->has_in_visible($item);
     $self->visible_remove($item);
     $self->inventory_add($item);
     print "\tYou place the $item back in your pack\n";
     return 1;
 }
 
-sub inventory_add { _add-> (@_, 'inventory') }
-sub visible_add { _add->(@_, 'visible') }
-sub composition_add { _add->(@_, 'composition') }
+sub inventory_add { _add(@_, 'inventory') }
+sub visible_add { _add(@_, 'visible') }
+sub composition_add { _add(@_, 'composition') }
 
 sub _add {
     my $self = shift;
     my $item = shift;
     my $container = shift;
-    my $added = $self->{$container}->add($item);
+    my $added = push @{$self->{$container}}, $item;
     $item->{'location'} = $self if $added;
     return $added;
 }
 
-sub inventory_remove { _remove-> (@_, 'inventory') }
-sub visible_remove { _remove->(@_, 'visible') }
-sub composition_remove { _remove->(@_, 'composition') }
+sub inventory_remove { _remove(@_, 'inventory') }
+sub visible_remove { _remove(@_, 'visible') }
+sub composition_remove {
+    my ($self, $item) = @_;
+    $self->_remove($item, 'composition');
+    $self->composition_check();
+}
 
 sub _remove {
     my $self = shift;
     my $item = shift;
     my $container = shift;
-    my $removed = $self->{$container}->remove($item);
-    delete $item->{'location'} if $removed;
+    my $removed;
+    # foreach (@{$self->{$container}}) {
+    #     print "$_\n";
+    # }
+    foreach my $i ( 0 .. scalar(@{$self->{$container}})-1 ) {
+        if ( $self->{$container}->[$i] == $item ) {
+            ($removed) = splice(@{$self->{$container}}, $i, 1);
+            if ( $removed ) {
+                delete $item->{'location'};
+                last;
+            }
+        }
+    }
     return $removed;
 }
 
-sub get_inventory { _get-> (@_, 'inventory') }
-sub get_visible { _get->(@_, 'visible') }
-sub get_composition { _get->(@_, 'composition') }
+sub inventory_contains { shift->_contains(shift, 'inventory') }
+sub visible_contains { shift->_contains(shift, 'visible') }
+sub composition_contains { shift->_contains(shift, 'composition') }
+
+sub _contains {
+    my $self = shift;
+    my $item = shift;
+    my $container = shift;
+    foreach my $object ( @{$self->{$container}} ) {
+        return $object if $object eq $item;
+    }
+    return 0;
+}
+
+sub inventory_get { shift->_get('inventory') }
+sub visible_get { shift->_get('visible') }
+sub composition_get { shift->_get('composition') }
 
 sub _get {
     my $self = shift;
     my $container = shift;
-    my @items = $self->{$container}->get_all();
+    my @items = @{$self->{$container}};
     return @items;
 }
 
 sub get_deep_visible {
     my $self = shift;
-    my @items = $self->get_visible();
+    my @items = $self->visible_get();
     my @all_items;
     push @all_items, @items;
     foreach my $item (@items) {
@@ -468,7 +504,7 @@ sub visible_containers {
     my $self = shift;
     my $find = shift;
     return $self if $find == $self;
-    my @items = $self->get_visible();
+    my @items = $self->visible_get();
     foreach my $item (@items) {
         my @deep_items = $item->visible_containers($find);
         return (@deep_items, $self) if @deep_items;
@@ -497,15 +533,19 @@ sub has_on_ground {
 
 sub get_all {
     my $self = shift;
-    my @possessions = ( $self->get_visible(), $self->get_inventory(), $self->get_composition() );
+    my @possessions = ( $self->visible_get(), $self->inventory_get(), $self->composition_get() );
     return @possessions;
 }
 
 sub destroy {
     my $self = shift;
-    my @items = $self->drop_all();
+    my @items = $self->get_all();
+    my $room = $self->where();
+    foreach my $item (@items) {
+        $room->visible_add($item);
+    }
     $self->{'location'}->visible_remove($self);
-    warn "\tYou destroyed the $self\n";
+    print "\tThe $self falls apart\n";
     undef $self;
     return @items;
 }
