@@ -541,11 +541,13 @@ sub destroy {
     my $self = shift;
     my @items = $self->get_all();
     my $room = $self->where();
+    print "\tThe $self falls apart\n";
     foreach my $item (@items) {
         $room->visible_add($item);
+        delete $item->{'cut_points'} if $item->{'cut_points'};
+        print "\t\tIts $item falls to the ground\n";
     }
     $self->{'location'}->visible_remove($self);
-    print "\tThe $self falls apart\n";
     undef $self;
     return @items;
 }
