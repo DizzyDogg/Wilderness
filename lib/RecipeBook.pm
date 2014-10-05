@@ -19,7 +19,7 @@ my $recipe;
 
 my @dirs = ('Item', 'Fixture');
 foreach my $dir (@dirs) {
-    opendir(DIR, $dir) or die $!;
+    opendir(DIR, "lib/$dir") or die $!;
     while ( my $file = readdir(DIR) ) {
         next if ($file =~ m/^\./);
         my $path = "$dir/$file";

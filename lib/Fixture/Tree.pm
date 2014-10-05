@@ -17,17 +17,23 @@ sub desc {
 # sub required_sharpness { return 15 }
 # sub required_mass { return 25 }
 
-sub cut_points { return 50 }
+sub required_composition { return qw{log log} }
 
-sub required_composition { return qw{log} }
+sub max_cut_points { return 50 }
+
+sub attach {
+    my $self = shift;
+    my $max = $self->max_cut_points();
+    return $self->cut_points($max);
+}
 
 sub initialize {
     my $self = shift;
     $self->SUPER::initialize();
-    $self->composition_add( Item::Log->new() );
-    $self->composition_add( Item::Log->new() );
-    $self->composition_add( Item::Log->new() );
-    $self->visible_add( Item::Branch->new() );
+    $self->composition_add( Item::Log->new(attached => 1) );
+    $self->composition_add( Item::Log->new(attached => 1) );
+    $self->composition_add( Item::Log->new(attached => 1) );
+    $self->visible_add( Item::Branch->new(attached => 1) );
     return $self;
 }
 

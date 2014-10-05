@@ -13,8 +13,7 @@ sub initialize {
         my $wheat = Item::Wheat->new();
         $self->add_item($wheat);
     }
-    my $bush = Fixture::Bush->new();
-    $self->add_item($bush);    
+    $self->add_item(Fixture::Bush->new(attached => 1));
 }
 
 1;

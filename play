@@ -3,10 +3,16 @@
 use strict;
 use warnings;
 
+use lib "lib";
+
 use World;
 use Player;
 use Data::Dumper;
 use History;
+
+use Carp;
+local $SIG{'__DIE__'} = \&Carp::confess;
+local $SIG{'__WARN__'} = \&Carp::cluck;
 
 my $world = World->new();
 my $player = Player->new(location => $world->{'grid'}->{'0,0,0'});
@@ -24,10 +30,10 @@ $player->inventory();
 
 while ( my ($verb, @arguments) = prompt() ) {
     if ( $verb =~ /^\_/ ) {
-        warn "\tFor your own safety, I would recommend against using '_'\n"
+        print "\tFor your own safety, I would recommend against using '_'\n"
             . "\tThe last time a player used that, they were stepped on by Big Foot\n"
             if $verb eq '_';
-        warn "\tYou have to actually TYPE what you want to do.\n"
+        print "\tYou have to actually TYPE what you want to do.\n"
             . "\tMy crystal ball broke, so I gave up on the mind-reading thing\n"
             if $verb eq '_empty_';
         next;
@@ -38,7 +44,7 @@ while ( my ($verb, @arguments) = prompt() ) {
         $player->$m(@args);
     }
     else {
-        warn "\tYou do not know how to $verb\n";
+        print "\tYou do not know how to $verb\n";
     }
 }
 
@@ -51,8 +57,9 @@ sub prompt {
     return "_" if $command =~ /\_/;
     return "_empty_" if $command =~ /^\s*$/;
     $command = lc $command;
-    $command =~ s/\bthe\b//;
-    $command =~ s/\ba\b//;
-    $command =~ s/\bat\b//;
+    $command =~ s/^\s+//;
+    $command =~ s/\bthe\b//g;
+    $command =~ s/\ba\b//g;
+    $command =~ s/\bat\b//g;
     return split /\s+/, $command;
 }

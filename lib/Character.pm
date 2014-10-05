@@ -13,6 +13,7 @@ use RecipeBook;
 use Data::Dumper;
 
 sub is_character { return 1 }
+sub required_composition { return qw{health} }
 
 sub initialize {
     my $self = shift;
@@ -41,7 +42,7 @@ sub move_to {
     my $self = shift;
     my $where = shift;
     my $here = $self->where();
-    $here->remove_item($self);
+    $here->visible_remove($self);
     $where->add_item($self);
     return $self;
 }
@@ -64,11 +65,11 @@ sub can_see {
 sub recipe {
     my $self = shift;
     my $product = shift;
-    return warn "\tWhich recipe would you like to see?\n" unless $product;
-    return warn "\tI don't know what a $product is\n" unless $recipe_book->has_recipe($product);
+    return print "\tWhich recipe would you like to see?\n" unless $product;
+    return print "\tI don't know what a $product is\n" unless $recipe_book->has_recipe($product);
     my @ingredients = $recipe_book->get_ingredients("$product");
     my @tools = $recipe_book->get_tools("$product");
-    return warn "\tA $product is not something you know how to make\n" unless @ingredients;
+    return print "\tA $product is not something you know how to make\n" unless @ingredients;
     my $recipe = "\tMaking a $product requires\n";
     foreach my $ingredient (@ingredients) {
         $recipe .= "\t\tA $ingredient\n";
@@ -79,18 +80,18 @@ sub recipe {
     }
     my $process = $recipe_book->get_process($product);
     $recipe .= "\t$process\n";
-    return warn "$recipe";
+    return print "$recipe";
 }
 
 sub make {
     my $self = shift;
     my $product = shift;
-    return warn "\tI am sorry, you want to make what?\n" unless $product;
-    return warn "\tI don't know what a $product is\n" unless defined $recipe_book->has_recipe($product);
+    return print "\tI am sorry, you want to make what?\n" unless $product;
+    return print "\tI don't know what a $product is\n" unless defined $recipe_book->has_recipe($product);
     my $here = $self->where();
     my @ingredients = $recipe_book->get_ingredients("$product");
     my @tools = $recipe_book->get_tools("$product");
-    return warn "\tA $product is not something you know how to make\n" unless @ingredients;
+    return print "\tA $product is not something you know how to make\n" unless @ingredients;
     my @lack;
     foreach my $ingredient (@ingredients) {
         push @lack, $ingredient unless $self->has($ingredient);
@@ -100,7 +101,7 @@ sub make {
     }
     my $lack_string = join "\n\t\tA ", @lack;
     if ( @lack ) {
-        return warn "\tTo make a $product, you still need\n" . "\t\tA $lack_string\n";
+        return print "\tTo make a $product, you still need\n" . "\t\tA $lack_string\n";
     }
     my $made = $recipe_book->get_package($product)->new();
     $made->is_item() ? $self->inventory_add($made) : $here->add_item($made);
@@ -108,7 +109,7 @@ sub make {
         $self->give($ingredient, 'to', $made);
     }
     my $process = $recipe_book->get_process($product);
-    return warn "\t$process\n";
+    return print "\t$process\n";
 }
 
 1;
