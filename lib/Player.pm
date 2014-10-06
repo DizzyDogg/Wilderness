@@ -93,6 +93,8 @@ sub quit {
 sub give {
     my ($self, $item, $to, $receiver) = @_;
     return print "\tGive what to whom?\n" unless $item;
+    ($item) = $self->str2obj($item) unless ref $item;
+    return print "\tI do not know what a $item is\n" unless ref $item;
     return print "\tYou have no $item to give\n" unless $self->has($item);
     return print "\tGive $item to whom?\n" unless ref $receiver;
     # see if this print spews on characters that do not exist anywhere
