@@ -17,7 +17,6 @@ sub initialize {
     $self->SUPER::initialize();
     $self->visible_add( Item::Knife->new() );
     $self->inventory_add( Item::Map->new() );
-    $self->{'location'} = [0, 0, 0];
     return $self;
 }
 
@@ -86,7 +85,9 @@ sub help {
 }
 
 sub quit {
-    print "\tI hope you enjoyed your stay in the Wilderness of Awesome !!!\n";
+    print "\tQuitters NEVER win, and winners NEVER quit...\n",
+        "\tBut, if you never quit AND never win ... then you are just a loser.\n",
+        "\tYou LOSE! I hope you have better luck in the REAL World.\n";
     exit }
 
 sub give {
@@ -109,7 +110,7 @@ sub go {
     my $direction = shift;
     my $here = $self->where();
     return print "\tGo where?\n" unless defined $direction;
-     my $new_room = $here->leads_to($direction);
+    my $new_room = $here->leads_to($direction);
     return print "\tCan't go $direction from here\n"
         unless $new_room;
     return print "\tYou can't go through the $new_room\n" if $new_room->is_obstruction();

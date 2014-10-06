@@ -37,6 +37,7 @@ sub get_items {
 
 sub get_exits {
     my $self = shift;
+    #my $coords = $self->get_grid_location();
     my $coords = $self->has_me();
     my ($x, $y, $z) = @$coords;
     my $north1 = $self->{'world'}->{'grid'}->{join ',', $x, $y+1, $z};
