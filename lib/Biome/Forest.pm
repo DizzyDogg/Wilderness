@@ -12,10 +12,10 @@ sub initialize {
     $self->SUPER::initialize();
     my $random = rand();
     my $tree = Fixture::Tree->new(attached => 1);
-        $self->add_item($tree);
+        $self->visible_add($tree);
     if ( $random < .6 ) {
         my $deer = Mob::Deer->new();
-        $self->add_item($deer);
+        $self->visible_add($deer);
     }
 }
 

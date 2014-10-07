@@ -11,7 +11,7 @@ sub initialize {
     $self->SUPER::initialize();
     if ( rand() < .8 ) {
         my $rock = Item::Rock->new();
-        $self->add_item($rock);
+        $self->visible_add($rock);
     }
     return $self;
 }

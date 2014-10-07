@@ -43,7 +43,7 @@ sub move_to {
     my $where = shift;
     my $here = $self->where();
     $here->visible_remove($self);
-    $where->add_item($self);
+    $where->visible_add($self);
     return $self;
 }
 
@@ -104,7 +104,7 @@ sub make {
         return print "\tTo make a $product, you still need\n" . "\t\tA $lack_string\n";
     }
     my $made = $recipe_book->get_package($product)->new();
-    $made->is_item() ? $self->inventory_add($made) : $here->add_item($made);
+    $made->is_item() ? $self->inventory_add($made) : $here->visible_add($made);
     foreach my $ingredient ( @ingredients ) {
         $self->give($ingredient, 'to', $made);
     }

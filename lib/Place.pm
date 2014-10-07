@@ -16,25 +16,6 @@ sub initialize {
     return $self;
 }
 
-sub add_item {
-    my $self = shift;
-    my $item = shift;
-    my $added = $self->visible_add($item);
-    $item->{'location'} = $self if $added;
-    return $added;
-}
-
-sub has {
-    my $self = shift;
-    my $item = shift;
-    return $self->visible_contains($item);
-}
-
-sub get_items {
-    my $self = shift;
-    return $self->visible_get();
-}
-
 sub get_exits {
     my $self = shift;
     #my $coords = $self->get_grid_location();

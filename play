@@ -16,7 +16,7 @@ local $SIG{'__WARN__'} = \&Carp::cluck;
 
 my $world = World->new();
 my $player = Player->new(location => $world->{'grid'}->{'0,0,0'});
-$world->{'grid'}->{'0,0,0'}->add_item($player);
+$world->{'grid'}->{'0,0,0'}->visible_add($player);
 my $command_history = History->new();
 
 print "\n\nWelcome to the World of Awesome.\n";

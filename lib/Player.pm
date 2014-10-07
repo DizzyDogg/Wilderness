@@ -184,7 +184,7 @@ sub take {
     my $self = shift;
     my $what = shift;
     my $here = $self->where();
-    my @baddies = grep { $_->is_character() } $here->get_items();
+    my @baddies = grep { $_->is_character() } $here->visible_get();
     return print "\tThere's no $what here\n" unless ref $what;
     return print "\tUmm ... What did you actually expect that to do?\n" if $what->is_player();
     foreach my $baddie (@baddies) {
@@ -227,7 +227,7 @@ sub look {
     else {
         print "\tYou are in the $here\n";
 
-        my @items = $here->get_items();
+        my @items = $here->visible_get();
         foreach my $item ( @items ) {
             next if $item eq $self;
             if ( $item->is_character() ) {
@@ -319,7 +319,7 @@ sub _kill {
     my @loot = $baddie->destroy();
     print "\t\tYou notice it has left:\n" if @loot;
     foreach my $item ( @loot ) {
-        $here->add_item($item);
+        $here->visible_add($item);
         print "\t\tA $item\n";
     }
     return $self;
@@ -331,7 +331,7 @@ sub fart {
     my $self = shift;
     my $here = $self->where();
 
-    my @items = $here->get_items();
+    my @items = $here->visible_get();
     foreach my $item ( @items ) {
         next if $item eq $self;
         if ( $item->is_character() ) {
@@ -345,11 +345,9 @@ sub fart {
         elsif ( $item->is_attached() ) {
             print "\tThe $item looks at you in disgust!\n";
         }
-        else {
-            #print "\tYou see a $item lying on the ground\n";
-        }
     }
     print "\n\tYou may want to move to one of the exits, quick!\n";
     return $self;
 }
+
 1;

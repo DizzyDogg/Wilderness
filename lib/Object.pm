@@ -260,7 +260,7 @@ sub can_reach {
     my $self = shift;
     my $thing = shift;
     my $place = $self->where();
-    my @items = $place->get_items();
+    my @items = $place->visible_get();
     push @items, $self->inventory_get(), $self->visible_get();
     foreach my $item (@items) {
         next if $item->is_character();
@@ -280,7 +280,7 @@ sub drop {
     my $here = $self->where();
     return print "\tYou don't have a $what\n" unless $self->has($what);
     $self->inventory_remove($what) || $self->visible_remove($what);
-    $here->add_item($what);
+    $here->visible_add($what);
     print "\tYou place the $what gently on the ground\n" if $self->is_player();
     return $self;
 }
@@ -300,7 +300,7 @@ sub detach {
     else {
         return print "\tThere is no $self to detach\n";
     }
-    $here->add_item($self);
+    $here->visible_add($self);
     print "\tThe $self falls to the ground\n";
     return $self;
 }
@@ -421,6 +421,7 @@ sub unequip {
     return 1;
 }
 
+#####  ADD  (puts an item in something and returns the item) #####
 sub inventory_add { _add(@_, 'inventory') }
 sub visible_add { _add(@_, 'visible') }
 sub composition_add { _add(@_, 'composition') }
@@ -434,6 +435,7 @@ sub _add {
     return $added;
 }
 
+#####  REMOVE  (removes an item from something and returns the item) #####
 sub inventory_remove { _remove(@_, 'inventory') }
 sub visible_remove { _remove(@_, 'visible') }
 sub composition_remove {
@@ -462,6 +464,7 @@ sub _remove {
     return $removed;
 }
 
+#####  CONTAINS  - BOOLEAN (Checks if an item is in something) #####
 sub inventory_contains { shift->_contains(shift, 'inventory') }
 sub visible_contains { shift->_contains(shift, 'visible') }
 sub composition_contains { shift->_contains(shift, 'composition') }
@@ -476,6 +479,7 @@ sub _contains {
     return 0;
 }
 
+#####  GET  (returns ALL the items in something) #####
 sub inventory_get { shift->_get('inventory') }
 sub visible_get { shift->_get('visible') }
 sub composition_get { shift->_get('composition') }

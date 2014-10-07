@@ -11,9 +11,9 @@ sub initialize {
     $self->SUPER::initialize();
     if ( rand() < .4 ) {
         my $wheat = Item::Wheat->new();
-        $self->add_item($wheat);
+        $self->visible_add($wheat);
     }
-    $self->add_item(Fixture::Bush->new(attached => 1));
+    $self->visible_add(Fixture::Bush->new(attached => 1));
 }
 
 1;
