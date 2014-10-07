@@ -192,7 +192,25 @@ sub apply_cut_damage {
 sub apply_bludgeon_damage {
     my $self = shift;
     my $amount = shift;
+    my $bludgeon_points = $self->{'bludgeon_points'};
+    my $dur = $self->{'durability'};
     return $amount unless $amount;
+    # if ( $bludgeon_points ) {
+    #     $bludgeon_points -= $amount;
+    #     if ( $bludgeon_points <= 0 ) {
+    #         my $action = 'hit_off';
+    #         $self->detach();
+    #         $self->{'bludgeon_points'} = 0;
+    #         # $amount = -$bludgeon_points;
+    #         return ($self, $action);
+    #     }
+    #     else {
+    #         $self->{'bludgeon_points'} = $bludgeon_points;
+    #         my $action = 'cut';
+    #         # $amount = 0;
+    #         return ($self, $action);
+    #     }
+    #  }
     my @items = $self->composition_get();
     if ( @items ) {
         foreach my $item ( @items ) {
@@ -213,7 +231,10 @@ sub apply_bludgeon_damage {
         }
         return $amount;
     }
-    return print "I made it to the end of bludgeon, what do I do here? I think I blew through the entire object.";
+    $self->apply_bludgeon_damage($amount) if $self;
+    return print "\tI made it to the end of bludgeon, what do I do here?\n",
+        "\tI think I blew through the entire object with damage left over\n",
+        "\tPlease Verify, then remove this print statement\n";
 }
 
 # I am not ready to actually implement this yet
