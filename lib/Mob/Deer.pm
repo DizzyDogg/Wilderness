@@ -11,13 +11,4 @@ sub desc { "The deer seems cute and kind ... but the sight of him makes you hung
 
 sub mass { return 60 }
 
-sub initialize {
-    my $self = shift;
-    $self->SUPER::initialize();
-    my $hide = Item::Hide->new();
-    $self->composition_add($hide);
-    my $venison = Item::Venison->new();
-    $self->composition_add($venison);
-}
-
 1;

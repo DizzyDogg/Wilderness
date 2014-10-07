@@ -330,20 +330,12 @@ sub die { print "\tUmmm ... No! That is the OPPOSITE of the point of this game\n
 sub fart {
     my $self = shift;
     my $here = $self->where();
-
+    print "\tYou loudly, and satisfyingly rip one, resting assured no one can hear you\n";
     my @items = $here->visible_get();
     foreach my $item ( @items ) {
         next if $item eq $self;
-        if ( $item->is_character() ) {
-            if ( $item->is_alive() ) {
-                print "\tA $item notices your presence\n";
-            }
-            else {
-                print "\tThe $item looks at you in disgust!\n";
-            }
-        }
-        elsif ( $item->is_attached() ) {
-            print "\tThe $item looks at you in disgust!\n";
+        if ( $item->is_character() && $item->is_alive() ) {
+            print "\tThe $item looks at you in disgust making you feel a bit awkward\n";
         }
     }
     print "\n\tYou may want to move to one of the exits, quick!\n";

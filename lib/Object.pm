@@ -87,8 +87,8 @@ sub is_attached {
 
 sub is_alive {
     my $self = shift;
-    my @comps = $self->composition_get() || ();
-    my $alive = (@comps && $comps[0] eq 'health');
+    my @comps = $self->composition_get();
+    my $alive = @comps && $comps[0] eq 'health';
     return $alive;
 }
 
