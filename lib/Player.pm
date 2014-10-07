@@ -40,6 +40,7 @@ my %verbs = (
     equip   => 'equip',
     examine => 'examine',
     exit    => 'go',
+    fart    => 'fart',
     get     => 'take',
     give    => 'give',
     go      => 'go',
@@ -326,4 +327,29 @@ sub _kill {
 
 sub die { print "\tUmmm ... No! That is the OPPOSITE of the point of this game\n" }
 
+sub fart {
+    my $self = shift;
+    my $here = $self->where();
+
+    my @items = $here->get_items();
+    foreach my $item ( @items ) {
+        next if $item eq $self;
+        if ( $item->is_character() ) {
+            if ( $item->is_alive() ) {
+                print "\tA $item notices your presence\n";
+            }
+            else {
+                print "\tThe $item looks at you in disgust!\n";
+            }
+        }
+        elsif ( $item->is_attached() ) {
+            print "\tThe $item looks at you in disgust!\n";
+        }
+        else {
+            #print "\tYou see a $item lying on the ground\n";
+        }
+    }
+    print "\n\tYou may want to move to one of the exits, quick!\n";
+    return $self;
+}
 1;
