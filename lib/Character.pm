@@ -19,7 +19,7 @@ sub initialize {
     my $self = shift;
     # create and add each individual meat and hide and bone, make carcass and define living animals
     $self->SUPER::initialize();
-    $self->composition_add( Health->new(durability => $self->mass()) );
+    $self->composition_add( Health->new(durability   => int($self->mass() / 2 )) );
     $self->composition_add( Item::Meat->new(quantity => int($self->mass() / 10)) );
     $self->composition_add( Item::Hide->new(quantity => int($self->mass() / 15)) );
     $self->composition_add( Item::Bone->new(quantity => int($self->mass() / 20)) );

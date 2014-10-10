@@ -185,7 +185,7 @@ sub apply_cut_damage {
         return ($self, $action);
     }
     else {
-        return 1;
+        return ($self, 'damaged');
     }
 }
 
@@ -307,7 +307,7 @@ sub drop {
 }
 
 
-# takes an item from container (compositionally) and places it on the ground
+# takes an item from what it is attached to and places it on the ground
 sub detach {
     my $self = shift;
     my $container = $self->has_me();
@@ -333,8 +333,8 @@ sub composition_check {
     $comp->{ $_ }++ foreach $self->composition_get();
     $req_comp->{ $_ }++ foreach $self->required_composition();
     my $sufficient = 1;
-    foreach my $item (keys %$comp) {
-        do { $sufficient = 0; last; } if $comp->{$item} < $req_comp->{$item};
+    foreach my $item (keys %$req_comp) {
+        do { $sufficient = 0; last; } if ( $comp->{$item} || 0 ) < ( $req_comp->{$item} || 0 );
     }
     $self->destroy() unless $sufficient;
     return $sufficient;
@@ -452,7 +452,7 @@ sub _add {
     my $item = shift;
     my $container = shift;
     my $added = push @{$self->{$container}}, $item;
-    $item->{'location'} = $self if $added;
+    $item->{'location'} = $self;
     return $added;
 }
 
@@ -470,9 +470,6 @@ sub _remove {
     my $item = shift;
     my $container = shift;
     my $removed;
-    # foreach (@{$self->{$container}}) {
-    #     print "$_\n";
-    # }
     foreach my $i ( 0 .. scalar(@{$self->{$container}})-1 ) {
         if ( $self->{$container}->[$i] == $item ) {
             ($removed) = splice(@{$self->{$container}}, $i, 1);
@@ -495,7 +492,7 @@ sub _contains {
     my $item = shift;
     my $container = shift;
     foreach my $object ( @{$self->{$container}} ) {
-        return $object if $object eq $item;
+        return $object if ref $object eq ref $item;
     }
     return 0;
 }
@@ -566,13 +563,25 @@ sub destroy {
     my $self = shift;
     my @items = $self->get_all();
     my $room = $self->where();
-    print "\tThe $self falls apart\n";
+    my $loc = $self->{'location'};
+    # print $self->{'location'}, "\n";
+    if ( $self->is_character() ) {
+        print "\tYou watch the life of the $self fade from its eyes\n";
+        print "\tYou have killed the $self ... I hope you are happy\n";
+    }
+    else {
+        print "\tThe $self falls apart\n" unless $self eq 'health';
+    }
     foreach my $item (@items) {
         $room->visible_add($item);
         delete $item->{'cut_points'} if $item->{'cut_points'};
         print "\t\tIts $item falls to the ground\n";
     }
-    $self->{'location'}->visible_remove($self);
+    my $remove = $loc->composition_contains($self) ? 'composition_remove' :
+                $loc->visible_contains($self) ? 'visible_remove' :
+                $loc->inventory_contains($self) ? 'inventory_remove' :
+                    warn "$self is had by something that does not 'have' it\n";
+    $loc->$remove($self);
     undef $self;
     return @items;
 }
