@@ -139,7 +139,7 @@ sub get_damage_points {
 sub apply_damage {
     my $self = shift;
     my $damage = shift;
-    foreach my $type (keys $damage) {
+    foreach my $type (keys %$damage) {
         my $apply = "apply_${type}_damage";
         my @hit = $self->$apply($damage->{$type});
         # I actually need to get apply_cut_damage to return the thing that was cut off as well, or the thing that was cut partially off, or that got destroyed.

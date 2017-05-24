@@ -10,8 +10,7 @@ sub initialize {
     my $self = shift;
     $self->SUPER::initialize();
     if ( rand() < .4 ) {
-        my $wheat = Item::Wheat->new();
-        $self->visible_add($wheat);
+        $self->visible_add(Item::Wheat->new());
     }
     $self->visible_add(Fixture::Bush->new(attached => 1));
 }

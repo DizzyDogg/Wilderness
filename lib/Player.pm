@@ -291,6 +291,7 @@ sub attack {
         $victim->apply_damage($damage);
         # print something about current health of $victim
     }
+    return 1;
 }
 
 sub kill { shift->_kill(kill => @_) }
